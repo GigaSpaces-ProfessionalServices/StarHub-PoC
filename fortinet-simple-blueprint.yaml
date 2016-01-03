@@ -12,14 +12,12 @@ inputs:
     default: admin
   host_ip:
     default: ''
-  agent_password:
-    default: ''
   agent_private_key_path:
     default: ''
 
-  lan_network_port_name:
+  lan_port:
     default: ''
-  external_network_port_name:
+  external_port:
     default: ''
 
 node_templates:
@@ -54,4 +52,16 @@ node_templates:
         type: cloudify.relationships.connected_to
       - target: FortinetHost
         type: cloudify.relationships.contained_in
+
+  lan_network_port:
+    type: cloudify.nodes.Port
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: { get_input: lan_port }
+
+  external_network_port:
+    type: cloudify.nodes.Port
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: { get_input: external_port }
 
