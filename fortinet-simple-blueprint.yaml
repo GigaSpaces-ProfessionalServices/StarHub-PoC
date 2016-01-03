@@ -1,0 +1,57 @@
+tosca_definitions_version: cloudify_dsl_1_2
+
+imports:
+    - http://www.getcloudify.org/spec/cloudify/3.3/types.yaml
+    - http://www.getcloudify.org/spec/openstack-plugin/1.3/plugin.yaml
+    - http://www.getcloudify.org/spec/fabric-plugin/1.3/plugin.yaml
+    - plugins/cloudify-fortinet-plugin/plugin.yaml
+
+inputs:
+
+  agent_user:
+    default: admin
+  host_ip:
+    default: ''
+  agent_password:
+    default: ''
+  agent_private_key_path:
+    default: ''
+
+  lan_network_port_name:
+    default: ''
+  external_network_port_name:
+    default: ''
+
+node_templates:
+
+node_types:
+
+  fortinet.nodes.Server:
+    derived_from: cloudify.nodes.Compute
+
+  fortinet.port.config:
+    derived_from: cloudify.nodes.ApplicationServer
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        configure:
+           implementation: fortinet.fortinet_plugin.tasks.port_config
+           executor: central_deployment_agent
+
+node_templates:
+
+  FortinetHost:
+    type: fortinet.nodes.Server
+    properties:
+      ip: { get_input: host_ip }
+      install_agent: false
+
+  FortinetPortConfig:
+    type: fortinet.port.config
+    relationships:
+      - target: lan_network_port
+        type: cloudify.relationships.connected_to
+      - target: external_network_port
+        type: cloudify.relationships.connected_to
+      - target: FortinetHost
+        type: cloudify.relationships.contained_in
+

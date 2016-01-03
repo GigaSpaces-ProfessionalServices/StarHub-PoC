@@ -55,7 +55,7 @@ node_templates:
         type: cloudify.openstack.server_connected_to_floating_ip
       - target: lan_network_port
         type: cloudify.openstack.server_connected_to_port
-      - target: wan_network_port
+      - target: external_network_port
         type: cloudify.openstack.server_connected_to_port
 
   FortinetPortConfig:
@@ -63,7 +63,7 @@ node_templates:
     relationships:
       - target: lan_network_port
         type: cloudify.relationships.connected_to
-      - target: wan_network_port
+      - target: external_network_port
         type: cloudify.relationships.connected_to
       - target: FortinetHost
         type: cloudify.relationships.contained_in
@@ -76,7 +76,7 @@ node_templates:
            implementation: fortinet.fortinet_plugin.tasks.route_config
            executor: central_deployment_agent
            inputs:
-               gateway: { get_property: [wan_network_subnet, subnet, gateway_ip] }
+               gateway: { get_property: [external_network_subnet, subnet, gateway_ip] }
 
     relationships:
       - target: FortinetHost
@@ -105,7 +105,7 @@ node_templates:
       resource_id: { get_input: lan_network_subnet_name }
       subnet:
         ip_version: 4
-        cidr: 192.168.1.99/24
+        cidr: 192.168.122.99/24
         gateway_ip: 192.168.1.99
     relationships:
       - target: lan_network
@@ -121,35 +121,35 @@ node_templates:
       - type: cloudify.relationships.depends_on
         target: lan_network_subnet
 
-## Managment network will act as WAN network
+## Managment network will act as external network
 
-#  Create WAN network
+#  Create external network
 
-  wan_network:
+  external_network:
     type: cloudify.openstack.nodes.Network
     properties:
-      resource_id: { get_input: wan_network_name }
+      resource_id: { get_input: external_network_name }
 
-  wan_network_subnet:
+  external_network_subnet:
     type: cloudify.openstack.nodes.Subnet
     properties:
-      resource_id: { get_input: wan_network_subnet_name }
+      resource_id: { get_input: external_network_subnet_name }
       subnet:
         dns_nameservers: [8.8.8.8]
         ip_version: 4
         cidr: 10.20.1.1/24
         gateway_ip: 10.20.1.2
     relationships:
-      - target: wan_network
+      - target: external_network
         type: cloudify.relationships.contained_in
 
-  wan_network_port:
+  external_network_port:
     type: cloudify.openstack.nodes.Port
     properties:
-      resource_id: { get_input: wan_network_port_name }
+      resource_id: { get_input: external_network_port_name }
     relationships:
       - type: cloudify.relationships.contained_in
-        target: wan_network
+        target: external_network
       - type: cloudify.relationships.depends_on
-        target: wan_network_subnet
+        target: external_network_subnet
 

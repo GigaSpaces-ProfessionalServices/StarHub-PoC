@@ -3,9 +3,8 @@ from cloudify.decorators import operation
 from cloudify.state import ctx_parameters as inputs
 
 forti_username = 'admin'
-forti_password = 'admin'
+forti_password = 'password'
 portMask = '255.255.255.0'
-
 
 @operation
 def port_config(ctx, **kwargs):
