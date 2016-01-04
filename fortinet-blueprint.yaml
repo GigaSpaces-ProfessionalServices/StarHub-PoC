@@ -12,8 +12,6 @@ inputs:
     default: admin
   fortinet_image:
     default: ''
-  ce_image:
-    default: ''
   flavor:
     default: ''
   agent_password:
@@ -39,8 +37,13 @@ node_types:
            implementation: fortinet.fortinet_plugin.tasks.port_config
            executor: central_deployment_agent
 
-  fortinet.static.route:
+  fortinet.policy.config:
     derived_from: cloudify.nodes.SoftwareComponent
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        configure:
+           implementation: fortinet.fortinet_plugin.tasks.policy_config
+           executor: central_deployment_agent
 
 node_templates:
 
@@ -68,21 +71,11 @@ node_templates:
       - target: FortinetHost
         type: cloudify.relationships.contained_in
 
-  FortinetStaticRouteConfig:
-    type: fortinet.static.route
-    interfaces:
-      cloudify.interfaces.lifecycle:
-        configure:
-           implementation: fortinet.fortinet_plugin.tasks.route_config
-           executor: central_deployment_agent
-           inputs:
-               gateway: { get_property: [external_network_subnet, subnet, gateway_ip] }
-
+  FortinetPolicyConfig:
+    type: fortinet.policy.config
     relationships:
       - target: FortinetHost
         type: cloudify.relationships.contained_in
-      - target: FortinetPortConfig
-        type: cloudify.relationships.depends_on
 
 # Create floating ip to access admin gui
 
@@ -105,8 +98,8 @@ node_templates:
       resource_id: { get_input: lan_network_subnet_name }
       subnet:
         ip_version: 4
-        cidr: 192.168.122.99/24
-        gateway_ip: 192.168.1.99
+        cidr: 10.10.1.0/24
+        gateway_ip: 10.10.1.1
     relationships:
       - target: lan_network
         type: cloudify.relationships.contained_in
@@ -137,8 +130,8 @@ node_templates:
       subnet:
         dns_nameservers: [8.8.8.8]
         ip_version: 4
-        cidr: 10.20.1.1/24
-        gateway_ip: 10.20.1.2
+        cidr: 192.168.122.0/24
+        gateway_ip: 192.168.122.1
     relationships:
       - target: external_network
         type: cloudify.relationships.contained_in
