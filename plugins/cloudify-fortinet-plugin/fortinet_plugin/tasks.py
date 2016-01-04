@@ -6,13 +6,28 @@ forti_username = 'admin'
 forti_password = 'password'
 portMask = '255.255.255.0'
 
+
 @operation
-def port_config(ctx, **kwargs):
+def test(ctx, **kwargs):
+
+    ctx.logger.info('Start test >>>>>>>>>')
+    host_id = get_host_id(ctx)
+    ctx.logger.info('host_id : {0}'.format(host_id))
+    host_instance = ctx._endpoint.get_node_instance(host_id)
+
+    host_ip = ctx._endpoint.get_host_node_instance_ip(host_id=host_id)
+    ctx.logger.info('1 host_ip : {0}'.format(host_ip))
+
+@operation
+def port_local_config(ctx, **kwargs):
     ctx.logger.info('Start port config task....')
     port_id = 2  # port 1 reserved for admin
 
-    fortinet_host_ip = get_host_ip(ctx)
-    ctx.logger.info('Fortinet_host_ip: {0}'.format(fortinet_host_ip))
+    host_id = get_host_id(ctx)
+    fortinet_host_ip = ctx._endpoint.get_host_node_instance_ip(host_id=host_id)
+    ctx.logger.info('fortinet host ip : {0}'.format(fortinet_host_ip))
+
+#    fortinet_host_ip = get_host_ip(ctx)
 
     for relationship in ctx.instance.relationships:
         ctx.logger.info('RELATIONSHIP type : {0}'.format(relationship.type))
@@ -20,7 +35,32 @@ def port_config(ctx, **kwargs):
         if 'connected_to' in relationship.type:
             port_alias = relationship.target.node.name
             ctx.logger.info('RELATIONSHIP target node name: {0}'.format(port_alias))
+            if 'external' in port_alias:
+                target_ip = '172.10.1.10'
+            if 'internal' in port_alias:
+                target_ip = '10.10.1.10'
+            ctx.logger.info('TARGET IP target_ip : {0}'.format(target_ip))
 
+            set_port(ctx, fortinet_host_ip, target_ip, port_id, port_alias)
+            port_id += 1
+
+@operation
+def port_config(ctx, **kwargs):
+    ctx.logger.info('Start port config task....')
+    port_id = 2  # port 1 reserved for admin
+
+    host_id = get_host_id(ctx)
+    fortinet_host_ip = ctx._endpoint.get_host_node_instance_ip(host_id=host_id)
+    ctx.logger.info('fortinet host ip : {0}'.format(fortinet_host_ip))
+
+#    fortinet_host_ip = get_host_ip(ctx)
+
+    for relationship in ctx.instance.relationships:
+        ctx.logger.info('RELATIONSHIP type : {0}'.format(relationship.type))
+
+        if 'connected_to' in relationship.type:
+            port_alias = relationship.target.node.name
+            ctx.logger.info('RELATIONSHIP target node name: {0}'.format(port_alias))
             target_ip = relationship.target.instance.runtime_properties['fixed_ip_address']
             ctx.logger.info('TARGET IP target_ip : {0}'.format(target_ip))
 
@@ -35,13 +75,24 @@ def set_port(ctx, fortinet_host_ip, target_ip, port_id, port_alias):
         'config system interface\n' \
         '   edit port%s\n' \
         '       set mode static\n' \
-        '       set allowaccess ping\n' \
+        '       set allowaccess ping http https\n' \
         '       set alias %s\n' \
         '       set ip %s  %s\n' \
         '   next\n' \
         'end' % (port_id, port_alias, target_ip, portMask)
 
     exec_command(ctx, command, fortinet_host_ip)
+
+
+@operation
+def policy_local_config(ctx, **kwargs):
+    ctx.logger.info('Start policy task....')
+
+    host_id = get_host_id(ctx)
+    fortinet_host_ip = ctx._endpoint.get_host_node_instance_ip(host_id=host_id)
+    ctx.logger.info('fortinet host ip : {0}'.format(fortinet_host_ip))
+
+    set_policy(ctx, fortinet_host_ip)
 
 
 @operation
@@ -59,13 +110,14 @@ def set_policy(ctx, fortinet_host_ip):
     command = \
         'config firewall policy\n' \
         '  edit 1\n' \
-        '    set srcintf \"any\"\n' \
-        '    set dstintf \"any\"\n' \
+        '    set srcintf \"port3\"\n' \
+        '    set dstintf \"port2\"\n' \
         '    set srcaddr \"all\"\n' \
         '    set dstaddr \"all\"\n' \
         '    set action accept\n' \
         '    set schedule \"always\"\n' \
-        '    set service \"ALL\"\n' \
+        '    set service \"HTTP\"\n' \
+        '    set nat enable\n' \
         '  next\n' \
         'end'
 
@@ -84,7 +136,8 @@ def route_config(ctx, **kwargs):
 
     for relationship in ctx.instance.relationships:
         if 'connected_to' in relationship.type:
-            target_ip = relationship.target.instance.runtime_properties['fixed_ip_address']
+#            target_ip = relationship.target.instance.runtime_properties['fixed_ip_address']
+            target_ip = relationship.target.instance.runtime_properties['fixed_ip']
 
     gateway = inputs['gateway']
     port_id = 3
