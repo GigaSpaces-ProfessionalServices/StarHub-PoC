@@ -1,10 +1,9 @@
-import pybvc
 from cloudify.decorators import operation
 from cloudify.state import ctx_parameters as inputs
 
 
-forti_username = 'admin'
-forti_password = 'admin'
+forti_username = 'vyatta'
+forti_password = 'vyatta'
 portMask = '255.255.255.0'
 
 
