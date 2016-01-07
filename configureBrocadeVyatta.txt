@@ -1,0 +1,17 @@
+Configure Brocade Vyatta 
+---------------------------
+
+user:vyatta password: vyatta
+
+configure
+set interfaces dataplane dp0s3 address dhcp
+# for ssh access
+set service ssh
+set service https
+commit
+save
+## snapshot the image
+
+
+
+

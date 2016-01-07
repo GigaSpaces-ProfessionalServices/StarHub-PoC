@@ -3,8 +3,29 @@ from cloudify.state import ctx_parameters as inputs
 import re
 import urllib
 import requests
-
 requests.packages.urllib3.disable_warnings()  # Surpress "InsecureRequestWarning" warning
+
+
+@operation
+def port_config(ctx, **kwargs):
+    ctx.logger.info('Start port config task....')
+    command = []
+    port_idx = 4
+
+    vyatta_host_ip = get_host_ip(ctx)
+    ctx.logger.info('vyatta_host_ip: {0}'.format(vyatta_host_ip))
+
+    for relationship in ctx.instance.relationships:
+        ctx.logger.info('RELATIONSHIP type : {0}'.format(relationship.type))
+
+        if 'connected_to' in relationship.type:
+            target_ip = relationship.target.instance.runtime_properties['fixed_ip_address']
+            ctx.logger.info('TARGET IP target_ip : {0}'.format(target_ip))
+            cmd = 'set interfaces dataplane dp0s' + port_idx + ' address ' + target_ip + '/24'
+            command.append(cmd)
+            port_idx = +1
+
+        exec_command(ctx, command, vyatta_host_ip)
 
 
 class VyattaControl(object):
@@ -15,7 +36,9 @@ class VyattaControl(object):
     def __init__(self, urlBase, user, passwd, ctx):
 
         self.urlBase = urlBase
+# configuration API
         self.urlConfBase = urlBase + 'rest/conf'
+# operation API
         self.urlOpBase = urlBase + 'rest/op'
         self.user = user
         self.passwd = passwd
@@ -114,28 +137,6 @@ class VyattaControl(object):
         rconf = requests.post(urlConfSave, auth=(self.user, self.passwd), verify=False)  # Request for save
         ctx.logger.info('{0}  :  {1}'.format(urlConfSave, rconf.status_code))
         return rconf.status_code
-
-
-@operation
-def port_config(ctx, **kwargs):
-    ctx.logger.info('Start port config task....')
-    command = []
-    port_idx = 4
-
-    vyatta_host_ip = get_host_ip(ctx)
-    ctx.logger.info('vyatta_host_ip: {0}'.format(vyatta_host_ip))
-
-    for relationship in ctx.instance.relationships:
-        ctx.logger.info('RELATIONSHIP type : {0}'.format(relationship.type))
-
-        if 'connected_to' in relationship.type:
-            target_ip = relationship.target.instance.runtime_properties['fixed_ip_address']
-            ctx.logger.info('TARGET IP target_ip : {0}'.format(target_ip))
-            cmd = 'set interfaces dataplane dp0s' + port_idx + ' address ' + target_ip + '/24'
-            command.append(cmd)
-            port_idx = +1
-
-        exec_command(ctx, command, vyatta_host_ip)
 
 
 def exec_command(ctx, command, vyatta_host_ip):

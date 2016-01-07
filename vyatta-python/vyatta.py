@@ -12,7 +12,7 @@ import logging
 
 VYUSER = "vyatta"
 VYPASSWD = "vyatta"
-URLBASE = "https://192.168.122.65/"
+URLBASE = "https://192.168.122.23/"
 
 
 class VyattaControl(object):
@@ -85,6 +85,10 @@ class VyattaControl(object):
                                      verify=False)  # Request to get the results
             print('$ ' + line)
             print(ropResult.text)
+            return ropResult
+
+
+
 
     def createEncodedUrl(self, confId, string):
         """
@@ -191,7 +195,16 @@ if __name__ == "__main__":
 #    vy.editConfigList(['set interfaces dataplane dp0s4 address 172.10.1.1/24',
 #                       'set interfaces dataplane dp0s7 address 10.1.1.1/24'])
 
-    vy.editConfigList(['delete interfaces dataplane dp0s4',
-                       'delete interfaces dataplane dp0s7'])
+#    vy.editConfigList(['delete interfaces dataplane dp0s4',
+#                       'delete interfaces dataplane dp0s7'])
 
-    vy.commandOperationalList(['show interfaces'])
+    resp = vy.commandOperationalList(['show interfaces'])
+
+    print "------------------"
+    interfaces = []
+    for interface in resp:
+        if 'dp0s' in interface:
+            interfaces.append(interface)
+    print interfaces
+
+#ip addr | grep dp0s | grep : | awk  '{print $2}' | cut -d':' -f 1

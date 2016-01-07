@@ -18,6 +18,7 @@ def test(ctx, **kwargs):
     host_ip = ctx._endpoint.get_host_node_instance_ip(host_id=host_id)
     ctx.logger.info('1 host_ip : {0}'.format(host_ip))
 
+
 @operation
 def port_local_config(ctx, **kwargs):
     ctx.logger.info('Start port config task....')
@@ -43,6 +44,7 @@ def port_local_config(ctx, **kwargs):
 
             set_port(ctx, fortinet_host_ip, target_ip, port_id, port_alias)
             port_id += 1
+
 
 @operation
 def port_config(ctx, **kwargs):
