@@ -39,6 +39,11 @@ node_types:
 
   vyatta.config.ports:
     derived_from: cloudify.nodes.SoftwareComponent
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        configure:
+           implementation: fortinet.fortinet_plugin.tasks.port_local_config
+           executor: central_deployment_agent
 
   vyatta.static.route:
     derived_from: cloudify.nodes.SoftwareComponent
@@ -78,22 +83,6 @@ node_templates:
         type: cloudify.relationships.connected_to
       - target: vyattaHost
         type: cloudify.relationships.contained_in
-
-#  vyattaRouteConfig:
-#    type: vyatta.static.route
-#    interfaces:
-#      cloudify.interfaces.lifecycle:
-#        configure:
-#           implementation: vyatta.vyatta_plugin.tasks.route_config
-#           executor: central_deployment_agent
-#           inputs:
-#               gateway: { get_property: [wan_network_subnet, subnet, gateway_ip] }
-#
-#    relationships:
-#      - target: vyattaHost
-#        type: cloudify.relationships.contained_in
-#      - target: vyattaPortConfig
-#        type: cloudify.relationships.depends_on
 
 # Create floating ip to access admin gui
 
