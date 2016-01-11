@@ -21,6 +21,8 @@ def port_config(ctx, **kwargs):
         if 'connected_to' in relationship.type:
             target_ip = relationship.target.instance.runtime_properties['fixed_ip_address']
             ctx.logger.info('TARGET IP target_ip : {0}'.format(target_ip))
+            cmd = 'set interfaces dataplane dp0s' + port_idx + ' description ' + relationship.target.node.name
+            command.append(cmd)
             cmd = 'set interfaces dataplane dp0s' + port_idx + ' address ' + target_ip + '/24'
             command.append(cmd)
             port_idx = +1
