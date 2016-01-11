@@ -32,6 +32,32 @@ def port_config(ctx, **kwargs):
         exec_command(ctx, command, vyatta_host_ip)
 
 
+@operation
+def route_policy_config(ctx, **kwargs):
+    ctx.logger.info('Start route policy task....')
+    command = []
+
+    vyatta_host_ip = get_host_ip(ctx)
+    ctx.logger.info('vyatta_host_ip: {0}'.format(vyatta_host_ip))
+
+    # for relationship in ctx.instance.relationships:
+    #     ctx.logger.info('RELATIONSHIP type : {0}'.format(relationship.type))
+    #
+    #     if 'connected_to' in relationship.type:
+    #         target_ip = relationship.target.instance.runtime_properties['fixed_ip_address']
+    #         ctx.logger.info('TARGET IP target_ip : {0}'.format(target_ip))
+    #         cmd = 'set interfaces dataplane dp0s' + port_idx + ' description ' + relationship.target.node.name
+    #         command.append(cmd)
+    #         cmd = 'set interfaces dataplane dp0s' + port_idx + ' address ' + target_ip + '/24'
+    #         command.append(cmd)
+    #         port_idx = +1
+
+
+    ### need to add ploicy here ....
+
+    exec_command(ctx, command, vyatta_host_ip)
+
+
 class VyattaControl(object):
     """
     Provides methods to show and modify Vyatta status and configurations.
