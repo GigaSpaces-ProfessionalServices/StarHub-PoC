@@ -21,12 +21,12 @@ from setuptools import setup
 setup(
 
     # Do not use underscores in the plugin name.
-    name='cloudify-vyatta-plugin',
+    name='cloudify-vtm-plugin',
 
     version='1.0',
     author='Alon Strikovsky',
     author_email='alons@gigaspaces.com',
-    description='For interaction with Brocade Vyatta',
+    description='For interaction with Brocade vTM',
 
     # This must correspond to the actual packages in the plugin.
     packages=['vtm_plugin'],
