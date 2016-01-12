@@ -1,4 +1,5 @@
-## vTM Brocade load balancer 
+# coding=utf-8
+## vTM Brocade load balancer
 
 from cloudify.decorators import operation
 from cloudify.state import ctx_parameters as inputs
@@ -58,6 +59,26 @@ def route_policy_config(ctx, **kwargs):
     exec_command(ctx, command, vtm_host_ip)
 
 
+#
+# 1) Creating a Test Pool
+# URI : https://10.88.88.42:9070/api/tm/3.5/config/active/pools/Test-Pool
+#
+# 2) Changing the load balancing alogrithm to Least Connections
+# URI : https://10.88.88.42:9070/api/tm/3.5/config/active/pools/Test-Pool
+#
+# 3) Create a session persistence class
+# URI : https://10.88.88.42:9070/api/tm/2.0/config/active/persistence/Persistence
+#
+# 4) Assigning a session persistence class to “Test-Pool”
+# URI : https://10.88.88.42:9070/api/tm/3.5/config/active/pools/Test-Pool
+#
+# 5) Creating a Traffic IP Group named Test-TIP
+# URI : https://10.88.88.42:9070/api/tm/2.0/config/active/traffic_ip_groups/Test-TIP
+#
+# 6) Creating a Virtual Server “Test-VS”, the virtual server is associated with  traffic IP “Test-IP” and server pool “Test-Pool”
+# URI : https://10.88.88.42:9070/api/tm/2.0/config/active/virtual_servers/Test-VS
+#
+
 class vtmControl(object):
     """
     Provides methods to modify vTM configurations.
@@ -67,9 +88,7 @@ class vtmControl(object):
 
         self.urlBase = urlBase
 # configuration API
-        self.urlConfBase = urlBase + 'rest/conf'
-# operation API
-        self.urlOpBase = urlBase + 'rest/op'
+        self.urlConfBase = urlBase + 'api/tm'
         self.user = user
         self.passwd = passwd
 
@@ -180,7 +199,7 @@ def exec_command(ctx, command, vtm_host_ip):
 
     vtm_username = 'admin'
     vtm_password = 'admin'
-    urlBase = 'https://' + vtm_host_ip + '/'
+    urlBase = 'https://' + vtm_host_ip + ':9070/'
 
     vy = vtmControl(ctx, urlBase, vtm_username, vtm_password)
 
