@@ -3,11 +3,13 @@ tosca_definitions_version: cloudify_dsl_1_2
 imports:
     - http://www.getcloudify.org/spec/cloudify/3.3/types.yaml
     - http://www.getcloudify.org/spec/fabric-plugin/1.3/plugin.yaml
-    - plugins/cloudify-vyatta-plugin/plugin.yaml
+    - plugins/cloudify-vtm-plugin/plugin.yaml
 
 inputs:
 
   agent_user:
+    default: admin
+  agent_password:
     default: admin
   host_ip:
     default: ''
@@ -21,62 +23,62 @@ inputs:
 
 node_types:
 
-  vyatta.nodes.Server:
+  vtm.nodes.Server:
     derived_from: cloudify.nodes.Compute
 
-  vyatta.port:
+  vtm.port:
     derived_from: cloudify.nodes.Port
     properties:
       ip:
         default: ''
 
-  vyatta.port.config:
+  vtm.pool.config:
+      derived_from: cloudify.nodes.ApplicationServer
+      interfaces:
+        cloudify.interfaces.lifecycle:
+          configure:
+             implementation: vtm.vtm_plugin.tasks.server_pool_local_config
+             executor: central_deployment_agent
+
+  vtm.port.config:
     derived_from: cloudify.nodes.ApplicationServer
     interfaces:
       cloudify.interfaces.lifecycle:
         configure:
-           implementation: vyatta.vtm_plugin.tasks.port_local_config
+           implementation: vtm.vtm_plugin.tasks.port_local_config
            executor: central_deployment_agent
 
-  vyatta.policy.config:
-    derived_from: cloudify.nodes.ApplicationServer
-    interfaces:
-      cloudify.interfaces.lifecycle:
-        configure:
-           implementation: vyatta.vtm_plugin.tasks.policy_local_config
-           executor: central_deployment_agent
 
 node_templates:
 
-  vyattaHost:
-    type: vyatta.nodes.Server
+  vtmHost:
+    type: vtm.nodes.Server
     properties:
       ip: { get_input: host_ip }
       install_agent: false
 
-  vyattaPortConfig:
-    type: vyatta.port.config
+  vtmPoolServerConfig:
+    type: vtm.pool.config
+    relationships:
+      - target: vtmHost
+        type: cloudify.relationships.contained_in
+
+  vtmPortConfig:
+    type: vtm.port.config
     relationships:
       - target: external_network
         type: cloudify.relationships.connected_to
       - target: internal_network
         type: cloudify.relationships.connected_to
-      - target: vyattaHost
-        type: cloudify.relationships.contained_in
-
-  vyattaPolicyConfig:
-    type: vyatta.policy.config
-    relationships:
-      - target: vyattaHost
+      - target: vtmHost
         type: cloudify.relationships.contained_in
 
   internal_network:
-    type: vyatta.port
+    type: vtm.port
     properties:
       ip: { get_input: internal_port }
 
   external_network:
-    type: vyatta.port
+    type: vtm.port
     properties:
       ip: { get_input: external_port }
-
