@@ -1,5 +1,4 @@
 ## Vyatta router
-
 from cloudify.decorators import operation
 from cloudify.state import ctx_parameters as inputs
 import re
@@ -143,11 +142,16 @@ class VyattaControl(object):
                                      auth=(self.user, self.passwd),
                                      verify=False)  # Request for configuration commands
 
-                ctx.logger.info('{0}  :  {1}'.format(urlConfPut, rconf.status_code))
+                print("%s : %s" % (urlConfPut, rconf.status_code))
 
-        self.commitConfig(confId)  # Commit configurations
-        self.saveConfig(confId)  # Save configurations
-        return self.deleteConfId(confId)  # Delete conf-id and return HTTP status code
+        # Commit configurations
+        self.commitConfig(confId)
+
+        # Save configurations
+        self.saveConfig(confId)
+
+        # Delete conf-id and return HTTP status code
+        return self.deleteConfId(confId)
 
     def commitConfig(self, confId, ctx):
         """
