@@ -79,11 +79,11 @@ node_templates:
 
 # Create floating ip to access admin gui
 
-  admin_managment_ip:
-    type: cloudify.openstack.nodes.FloatingIP
-    properties:
-      floatingip:
-        floating_network_name: { get_input: external_network_name }
+#  admin_managment_ip:
+#    type: cloudify.openstack.nodes.FloatingIP
+#    properties:
+#      floatingip:
+#        floating_network_name: { get_input: external_network_name }
 
 #  Create LAN network
 
