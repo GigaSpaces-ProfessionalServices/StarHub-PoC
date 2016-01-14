@@ -4,13 +4,13 @@ imports:
     - http://www.getcloudify.org/spec/cloudify/3.3.1/types.yaml
     - http://www.getcloudify.org/spec/openstack-plugin/1.3.1/plugin.yaml
     - http://www.getcloudify.org/spec/fabric-plugin/1.3.1/plugin.yaml
-    - plugins/cloudify-fortinet-plugin/plugin.yaml
+    - plugins/cloudify-vtm-plugin/plugin.yaml
 
 inputs:
 
   agent_user:
     default: admin
-  fortinet_image:
+  vtm_image:
     default: ''
   flavor:
     default: ''
@@ -29,52 +29,52 @@ node_templates:
 
 node_types:
 
-  fortinet.port.config:
+  vtm.port.config:
     derived_from: cloudify.nodes.SoftwareComponent
     interfaces:
       cloudify.interfaces.lifecycle:
         configure:
-           implementation: fortinet.fortinet_plugin.tasks.port_config
+           implementation: vtm.vtm_plugin.tasks.port_config
            executor: central_deployment_agent
 
-  fortinet.policy.config:
+  vtm.policy.config:
     derived_from: cloudify.nodes.SoftwareComponent
     interfaces:
       cloudify.interfaces.lifecycle:
         configure:
-           implementation: fortinet.fortinet_plugin.tasks.policy_config
+           implementation: vtm.vtm_plugin.tasks.policy_config
            executor: central_deployment_agent
 
 node_templates:
 
-  FortinetHost:
+  vtmHost:
     type: cloudify.openstack.nodes.Server
     properties:
       install_agent: false
-      image: { get_input: fortinet_image }
+      image: { get_input: vtm_image }
       flavor: { get_input: flavor }
     relationships:
-      - target: admin_managment_ip
-        type: cloudify.openstack.server_connected_to_floating_ip
+#      - target: admin_managment_ip
+#        type: cloudify.openstack.server_connected_to_floating_ip
       - target: lan_network_port
         type: cloudify.openstack.server_connected_to_port
       - target: external_network_port
         type: cloudify.openstack.server_connected_to_port
 
-  FortinetPortConfig:
-    type: fortinet.port.config
+  vtmPortConfig:
+    type: vtm.port.config
     relationships:
       - target: lan_network_port
         type: cloudify.relationships.connected_to
       - target: external_network_port
         type: cloudify.relationships.connected_to
-      - target: FortinetHost
+      - target: vtmHost
         type: cloudify.relationships.contained_in
 
-  FortinetPolicyConfig:
-    type: fortinet.policy.config
+  vtmPolicyConfig:
+    type: vtm.policy.config
     relationships:
-      - target: FortinetHost
+      - target: vtmHost
         type: cloudify.relationships.contained_in
 
 #  LAN network

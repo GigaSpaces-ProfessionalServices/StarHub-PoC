@@ -3,7 +3,7 @@ from cloudify.decorators import operation
 from cloudify.state import ctx_parameters as inputs
 
 forti_username = 'admin'
-forti_password = 'password'
+forti_password = 'admin'
 portMask = '255.255.255.0'
 
 
@@ -119,7 +119,7 @@ def set_policy(ctx, fortinet_host_ip):
         '    set action accept\n' \
         '    set schedule \"always\"\n' \
         '    set service \"HTTP\"\n' \
-        '    set nat enable\n' \
+        '    set nat disable\n' \
         '  next\n' \
         'end'
 
