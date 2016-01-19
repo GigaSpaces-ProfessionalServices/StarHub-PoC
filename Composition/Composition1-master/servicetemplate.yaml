@@ -6,6 +6,7 @@ imports:
   - http://www.getcloudify.org/spec/openstack-plugin/1.3.1/plugin.yaml
 #  - https://raw.githubusercontent.com/cloudify-examples/cloudify-proxy-plugin/master/plugin.yaml
   - plugin.yaml
+
 inputs:
   application_network_name:
     default: application-network
