@@ -5,6 +5,7 @@ imports:
     - http://www.getcloudify.org/spec/openstack-plugin/1.3.1/plugin.yaml
     - http://www.getcloudify.org/spec/fabric-plugin/1.3.1/plugin.yaml
     - plugins/cloudify-fortinet-plugin/plugin.yaml
+    - https://raw.githubusercontent.com/cloudify-examples/cloudify-proxy-plugin/master/plugin.yaml
 
 inputs:
 
@@ -15,17 +16,21 @@ inputs:
   flavor:
     default: ''
   agent_password:
-    default: ''
-  external_network_name:
-    default: ''
-  lan_network_name:
-    default: ''
-  lan_network_subnet_name:
-    default: ''
-  lan_network_port_name:
-    default: ''
+    default: admin
 
-node_templates:
+  lb_network1:
+      type: string
+      description: Network resource id to LB
+  lb_network1_subnet:
+      type: string
+      description: Network subnet resource id to LB
+
+  app_network2:
+        type: string
+        description: Network resource id to Application
+  app_network2_subnet:
+      type: string
+        description: Network subnet resource id to Application
 
 node_types:
 
@@ -54,20 +59,18 @@ node_templates:
       image: { get_input: fortinet_image }
       flavor: { get_input: flavor }
     relationships:
-      - target: admin_managment_ip
-        type: cloudify.openstack.server_connected_to_floating_ip
-      - target: lan_network_port
+      - target: lb_network1_port
         type: cloudify.openstack.server_connected_to_port
-      - target: external_network_port
+      - target: app_network2_port
         type: cloudify.openstack.server_connected_to_port
 
   FortinetPortConfig:
     type: fortinet.port.config
     relationships:
-      - target: lan_network_port
-        type: cloudify.relationships.connected_to
-      - target: external_network_port
-        type: cloudify.relationships.connected_to
+      - target: lb_network1_port
+        type: cloudify.openstack.server_connected_to_port
+      - target: app_network2_port
+        type: cloudify.openstack.server_connected_to_port
       - target: FortinetHost
         type: cloudify.relationships.contained_in
 
@@ -77,69 +80,59 @@ node_templates:
       - target: FortinetHost
         type: cloudify.relationships.contained_in
 
-#  LAN network
 
-  lan_network:
+#  LB network
+
+  lb_network1:
     type: cloudify.openstack.nodes.Network
     properties:
-      resource_id: { get_input: lan_network_name }
+      resource_id: { get_input: lb_network1 }
       use_external_resource : true
 
-  lan_network_subnet:
+  lb_network1_lb_subnet:
     type: cloudify.openstack.nodes.Subnet
     properties:
-      resource_id: { get_input: lan_network_subnet_name }
+      resource_id: { get_input: lb_network1_subnet }
       use_external_resource : true
-#      subnet:
-#        ip_version: 4
-#        cidr: 10.10.1.0/24
-#        gateway_ip: 10.10.1.1
     relationships:
-      - target: lan_network
+      - target: lb_network1
         type: cloudify.relationships.contained_in
 
-  lan_network_port:
+  lb_network1_port:
     type: cloudify.openstack.nodes.Port
     properties:
-      resource_id: { get_input: lan_network_port_name }
-      use_external_resource : true
+      use_external_resource : false
     relationships:
       - type: cloudify.relationships.contained_in
-        target: lan_network
+        target: lb_network1
       - type: cloudify.relationships.depends_on
-        target: lan_network_subnet
+        target: lb_network1_subnet
 
-## Managment network will act as external network
 
-#  External network
+#  APP network
 
-  external_network:
+  app_network2:
     type: cloudify.openstack.nodes.Network
     properties:
-      resource_id: { get_input: external_network_name }
+      resource_id: { get_input: app_network2 }
       use_external_resource : true
 
-  external_network_subnet:
+  app_network2_subnet:
     type: cloudify.openstack.nodes.Subnet
     properties:
-      resource_id: { get_input: external_network_subnet_name }
+      resource_id: { get_input: app_network2_subnet }
       use_external_resource : true
-#      subnet:
-#        dns_nameservers: [8.8.8.8]
-#        ip_version: 4
-#        cidr: 192.168.122.0/24
-#        gateway_ip: 192.168.122.1
     relationships:
-      - target: external_network
+      - target: app_network2
         type: cloudify.relationships.contained_in
 
-  external_network_port:
+  app_network2_port:
     type: cloudify.openstack.nodes.Port
     properties:
-      resource_id: { get_input: external_network_port_name }
-      use_external_resource : true
+      use_external_resource : false
     relationships:
       - type: cloudify.relationships.contained_in
-        target: external_network
+        target: app_network2
       - type: cloudify.relationships.depends_on
-        target: external_network_subnet
+        target: app_network2_subnet
+

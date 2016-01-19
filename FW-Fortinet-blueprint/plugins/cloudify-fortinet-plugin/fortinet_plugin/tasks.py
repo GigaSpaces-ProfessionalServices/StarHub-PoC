@@ -30,6 +30,10 @@ def port_local_config(ctx, **kwargs):
 
 #    fortinet_host_ip = get_host_ip(ctx)
 
+#   get FW license from FTP server...
+
+#   set_license(ctx, fortinet_host_ip)
+
     for relationship in ctx.instance.relationships:
         ctx.logger.info('RELATIONSHIP type : {0}'.format(relationship.type))
 
@@ -125,6 +129,7 @@ def set_policy(ctx, fortinet_host_ip):
 
     exec_command(ctx, command, fortinet_host_ip)
 
+
 @operation
 def route_config(ctx, **kwargs):
     ctx.logger.info('Start route task....')
@@ -172,6 +177,18 @@ def exec_command(ctx, command, fortinet_host_ip):
 
     conn.execute_command(command)
     conn.close()
+
+def set_license(ctx, fortinet_host_ip):
+
+    ftp_server = '10.0.1.27'
+    ftp_username = ''
+    ftp_password = ''
+    license_file_name = ''
+
+    command = \
+        'restore vmlicense ftp %s %s:27 %s $s\n' % (license_file_name, ftp_server, ftp_username, ftp_password)
+
+    exec_command(ctx, command, fortinet_host_ip)
 
 
 def get_host_ip(ctx):

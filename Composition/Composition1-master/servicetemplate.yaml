@@ -108,14 +108,17 @@ node_templates:
           create:
             inputs:
               deployment_inputs:
-                network1: { get_property: [ lb_network, resource_id ] }
+                lb_network1: { get_property: [ lb_network, resource_id ] }
+                lb_network1_subnet: { get_property: [ lb_network_subnet, resource_id ] }
                 vm_list: { get_attribute: [ appl_vm1, ip ] }
+
       relationships:
         - target: appl_vm1
           type: cloudify.relationships.connected_to
         - target: lb_network
           type: cloudify.relationships.connected_to
 
+# Chain FW blueprint
   fw1_deployment:
         type: cloudify.nodes.BlueprintDeployment
         properties:
@@ -125,8 +128,11 @@ node_templates:
             create:
               inputs:
                 deployment_inputs:
-                  network1: { get_property: [ lb_network, resource_id ] }
-                  network2: { get_property: [ application_network, resource_id ] }
+                  lb_network1: { get_property: [ lb_network, resource_id ] }
+                  lb_network1_subnet: { get_property: [ lb_network_subnet, resource_id ] }
+                  app_network2: { get_property: [ application_network, resource_id ] }
+                  app_network2_subnet: { get_property: [ application_network_subnet, resource_id ] }
+
         relationships:
           - target: lb_network
             type: cloudify.relationships.connected_to
