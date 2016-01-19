@@ -1,0 +1,47 @@
+tosca_definitions_version: cloudify_dsl_1_2
+
+imports:
+  - http://www.getcloudify.org/spec/cloudify/3.3.1/types.yaml
+  - http://www.getcloudify.org/spec/fabric-plugin/1.3.1/plugin.yaml
+  - http://www.getcloudify.org/spec/openstack-plugin/1.3.1/plugin.yaml
+  - https://raw.githubusercontent.com/cloudify-examples/cloudify-proxy-plugin/master/plugin.yaml
+
+inputs:
+  image_id:
+      default: '74ff4015-aee1-4e02-aaa8-1c77b2650394'
+      type: string
+
+  flavor_id:
+      default: '196235bc-7ca5-4085-ac81-7e0242bda3f9'
+      type: string
+
+  network1:
+      type: string
+      description: Network resource id attached to
+
+  vm_list:
+      type: string
+      description: Backend VMs connected
+
+node_templates:
+
+# Reference LB and Application Networks
+  lb_network:
+    type: cloudify.openstack.nodes.Network
+    properties:
+      resource_id: { get_input: network1 }
+      use_external_resource : true
+
+
+
+# Create a LB VM
+
+  lb_vm:
+    type: cloudify.openstack.nodes.Server
+    properties:
+      server:
+        image: { get_input: image_id }
+        flavor: { get_input: flavor_id }
+    relationships:
+      - target: lb_network
+        type: cloudify.relationships.connected_to

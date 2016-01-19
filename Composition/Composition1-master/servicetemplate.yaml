@@ -1,0 +1,134 @@
+tosca_definitions_version: cloudify_dsl_1_2
+
+imports:
+  - http://www.getcloudify.org/spec/cloudify/3.3.1/types.yaml
+  - http://www.getcloudify.org/spec/fabric-plugin/1.3.1/plugin.yaml
+  - http://www.getcloudify.org/spec/openstack-plugin/1.3.1/plugin.yaml
+#  - https://raw.githubusercontent.com/cloudify-examples/cloudify-proxy-plugin/master/plugin.yaml
+  - plugin.yaml
+inputs:
+  application_network_name:
+    default: application-network
+    type: string
+
+  application_network_subnet_name:
+    default: application-network-subnet
+    type: string
+
+  lb_network_name:
+      default: lb-network
+      type: string
+
+  lb_network_subnet_name:
+      default: lb-network-subnet
+      type: string
+
+  image_id:
+    default: '74ff4015-aee1-4e02-aaa8-1c77b2650394'
+    type: string
+
+  flavor_id:
+    default: '196235bc-7ca5-4085-ac81-7e0242bda3f9'
+    type: string
+
+  lb_blueprint_id:
+      default: loadbalancer
+      type: string
+      description: Load Balancer blueprint ID
+
+  fw_blueprint_id:
+      default: firewall
+      type: string
+      description: FW blueprint ID
+
+node_templates:
+
+# Create an Application Network
+  application_network:
+    type: cloudify.openstack.nodes.Network
+    properties:
+      resource_id: { get_input: application_network_name }
+      use_external_resource : false
+
+  application_network_subnet:
+    type: cloudify.openstack.nodes.Subnet
+    properties:
+      resource_id: { get_input: application_network_subnet_name }
+      use_external_resource : false
+      subnet:
+        ip_version: 4
+        cidr: 10.20.0.0/29
+        gateway_ip: 10.20.0.1
+    relationships:
+      - target: application_network
+        type: cloudify.relationships.contained_in
+
+# Create a LB Network
+  lb_network:
+    type: cloudify.openstack.nodes.Network
+    properties:
+      resource_id: { get_input: lb_network_name }
+      use_external_resource : false
+
+  lb_network_subnet:
+    type: cloudify.openstack.nodes.Subnet
+    properties:
+      resource_id: { get_input: lb_network_subnet_name }
+      use_external_resource : false
+      subnet:
+        ip_version: 4
+        cidr: 10.10.0.0/24
+        gateway_ip: 10.10.0.1
+    relationships:
+      - target: lb_network
+        type: cloudify.relationships.contained_in
+
+
+# Create an Application VM
+
+  appl_vm1:
+    type: cloudify.openstack.nodes.Server
+    properties:
+      server:
+        image: { get_input: image_id }
+        flavor: { get_input: flavor_id }
+    relationships:
+      - target: application_network
+        type: cloudify.relationships.connected_to
+
+
+# Chain LB blueprint
+  lb_deployment:
+      type: cloudify.nodes.BlueprintDeployment
+      properties:
+        blueprint_id: { get_input: lb_blueprint_id }
+      interfaces:
+        cloudify.interfaces.lifecycle:
+          create:
+            inputs:
+              deployment_inputs:
+                network1: { get_property: [ lb_network, resource_id ] }
+                vm_list: { get_attribute: [ appl_vm1, ip ] }
+      relationships:
+        - target: appl_vm1
+          type: cloudify.relationships.connected_to
+        - target: lb_network
+          type: cloudify.relationships.connected_to
+
+  fw1_deployment:
+        type: cloudify.nodes.BlueprintDeployment
+        properties:
+          blueprint_id: { get_input: fw_blueprint_id }
+        interfaces:
+          cloudify.interfaces.lifecycle:
+            create:
+              inputs:
+                deployment_inputs:
+                  network1: { get_property: [ lb_network, resource_id ] }
+                  network2: { get_property: [ application_network, resource_id ] }
+        relationships:
+          - target: lb_network
+            type: cloudify.relationships.connected_to
+          - target: application_network
+            type: cloudify.relationships.connected_to
+
