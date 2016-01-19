@@ -33,7 +33,3 @@ export OS_PASSWORD="nfv-admin@shdemo.local"
 export OS_REGION_NAME="nova"
 # Don't leave a blank variable, unset it if it was empty
 if [ -z "$OS_REGION_NAME" ]; then unset OS_REGION_NAME; fi
-~
-~
-~
-~
