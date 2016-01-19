@@ -178,6 +178,7 @@ def exec_command(ctx, command, fortinet_host_ip):
     conn.execute_command(command)
     conn.close()
 
+
 def set_license(ctx, fortinet_host_ip):
 
     ftp_server = '10.0.1.27'
@@ -187,6 +188,16 @@ def set_license(ctx, fortinet_host_ip):
 
     command = \
         'restore vmlicense ftp %s %s:27 %s $s\n' % (license_file_name, ftp_server, ftp_username, ftp_password)
+
+    exec_command(ctx, command, fortinet_host_ip)
+
+# Validate license
+
+    command = \
+        'configure system central-management\n' \
+        'set type fortimanager\n' \
+        'set fmg X.X.X.X\n' \
+        'set include-default-servers disable\n'
 
     exec_command(ctx, command, fortinet_host_ip)
 
