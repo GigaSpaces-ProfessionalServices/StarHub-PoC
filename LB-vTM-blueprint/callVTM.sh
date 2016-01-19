@@ -7,6 +7,11 @@ curl -v -H "Content-Type: application/json" -u admin:admin  -k -X PUT --data "@S
 
 
 
+
+
+
+
+
 curl -v -H "Content-Type: application/json" -u admin:admin  -k -X PUT --data "@AddPool.json" \
   https://192.168.122.84:9070/api/tm/3.5/config/active/pools/CFY-Pool
 
