@@ -9,6 +9,7 @@ config system autoupdate tunneling
     set address 192.168.102.2:8080
 end
 
+------------------------------------
 
 * CreateStaticRouting
 
