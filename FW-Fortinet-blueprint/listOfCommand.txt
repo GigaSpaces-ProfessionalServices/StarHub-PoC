@@ -1,3 +1,5 @@
+On Image --
+
 configure system central-management
     set type fortimanager
     set fmg X.X.X.X
