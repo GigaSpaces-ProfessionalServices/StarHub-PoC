@@ -35,7 +35,7 @@ node_types:
     interfaces:
       cloudify.interfaces.lifecycle:
         configure:
-           implementation: vyatta.vtm_plugin.tasks.port_local_config
+           implementation: vyatta.vyatta_plugin.tasks.port_config
            executor: central_deployment_agent
 
   vyatta.policy.config:
@@ -43,7 +43,7 @@ node_types:
     interfaces:
       cloudify.interfaces.lifecycle:
         configure:
-           implementation: vyatta.vtm_plugin.tasks.policy_local_config
+           implementation: vyatta.vyatta_plugin.tasks.route_policy_config
            executor: central_deployment_agent
 
 node_templates:

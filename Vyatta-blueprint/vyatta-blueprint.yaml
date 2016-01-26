@@ -42,7 +42,7 @@ node_types:
     interfaces:
       cloudify.interfaces.lifecycle:
         configure:
-           implementation: vyatta.vtm_plugin.tasks.port_config
+           implementation: vyatta.vyatta_plugin.tasks.port_config
            executor: central_deployment_agent
 
   vyatta.config.route.policy:
@@ -50,7 +50,7 @@ node_types:
     interfaces:
       cloudify.interfaces.lifecycle:
         configure:
-           implementation: vyatta.vtm_plugin.tasks.route_policy_config
+           implementation: vyatta.vyatta_plugin.tasks.route_policy_config
            executor: central_deployment_agent
 
 node_templates:
@@ -62,8 +62,6 @@ node_templates:
       image: { get_input: vyatta_image }
       flavor: { get_input: flavor }
     relationships:
-      - target: admin_managment_ip
-        type: cloudify.openstack.server_connected_to_floating_ip
       - target: lan_network_port
         type: cloudify.openstack.server_connected_to_port
       - target: wan_network_port
@@ -88,14 +86,6 @@ node_templates:
         type: cloudify.relationships.connected_to
       - target: vyattaHost
         type: cloudify.relationships.contained_in
-
-# Create floating ip to access admin gui
-
-  admin_managment_ip:
-    type: cloudify.openstack.nodes.FloatingIP
-    properties:
-      floatingip:
-        floating_network_name: { get_input: external_network_name }
 
 #  Create LAN network
 
@@ -125,8 +115,6 @@ node_templates:
         target: lan_network
       - type: cloudify.relationships.depends_on
         target: lan_network_subnet
-
-## Managment network will act as WAN network
 
 #  Create WAN network
 
