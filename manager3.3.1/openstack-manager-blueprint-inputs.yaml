@@ -40,7 +40,7 @@ flavor_id: '3'
 external_network_name: 'VIO-External-01_VLAN301'
 
 # SSH user used to connect to the manager
-ssh_user: root
+ssh_user: 'centos'
 
 # Names of the openstack components
 #manager_server_name: cloudify-manager-server
@@ -57,7 +57,7 @@ management_router: service-gw-01
 
 # This is the default user that the manager will use while connecting to an application host.
 # This user can be overriden in different places.
-agents_user: 'root'
+agents_user: 'centos'
 
 #############################
 # Security Settings

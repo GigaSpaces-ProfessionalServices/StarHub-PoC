@@ -602,14 +602,12 @@ node_templates:
   management_network:
     type: cloudify.openstack.nodes.Network
     properties:
-#      use_external_resource: true
       resource_id: { get_input: management_network_name }
       openstack_config: *openstack_configuration
 
   management_subnet:
     type: cloudify.openstack.nodes.Subnet
     properties:
-#      use_external_resource: true
       resource_id: { get_input: management_subnet_name }
       subnet:
         ip_version: 4
@@ -624,7 +622,6 @@ node_templates:
   manager_port:
     type: cloudify.openstack.nodes.Port
     properties:
-#      use_external_resource: true
       openstack_config: *openstack_configuration
       resource_id: { get_input: manager_port_name }
     relationships:
@@ -705,8 +702,8 @@ node_templates:
       openstack_config: *openstack_configuration
     relationships:
 #      - target: manager_server_ip
-      - target: manager_port
 #        type: cloudify.openstack.server_connected_to_floating_ip
+      - target: manager_port
         type: cloudify.openstack.server_connected_to_port
         source_interfaces:
           cloudify.interfaces.relationship_lifecycle:
@@ -865,6 +862,6 @@ plugins:
 
 outputs:
   manager_ip:
-#    value: { get_attribute: [manager_server_ip, floating_ip_address] }
     value:  { get_attribute: [manager_port, fixed_ip_address] }
+#    value: { get_attribute: [manager_server_ip, floating_ip_address] }
 
