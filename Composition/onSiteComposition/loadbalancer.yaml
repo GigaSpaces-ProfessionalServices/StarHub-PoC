@@ -9,7 +9,7 @@ imports:
 
 inputs:
   image_id: 
-      default: '7d237-2009-48a8-8dee-cb956d70f057'
+      default: '3cc7d237-2009-48a8-8dee-cb956d70f057'
       type: string
       
   flavor_id:
