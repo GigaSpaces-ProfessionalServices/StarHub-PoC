@@ -1,13 +1,10 @@
 tosca_definitions_version: cloudify_dsl_1_2
 
 imports:
-  - http://www.getcloudify.org/spec/cloudify/3.3.1/types.yaml
-  - http://www.getcloudify.org/spec/fabric-plugin/1.3.1/plugin.yaml
-  - http://www.getcloudify.org/spec/openstack-plugin/1.3.1/plugin.yaml
-  - types/manager3.3.1-types.yaml
-
-
-
+  - http://10.60.0.12:8000/cloudify-types.yaml
+  - http://10.60.0.12:8000/fabric-plugin.yaml
+  - http://10.60.0.12:8000/openstack-plugin.yaml
+  - types/manager-types.yaml
 
 inputs:
 
@@ -43,6 +40,10 @@ inputs:
     default: ''
     type: string
 
+  cacert_key:
+     default: ''
+     type: string
+
   manager_public_key_name:
     type: string
 
@@ -67,7 +68,7 @@ inputs:
     default: false
 
   manager_server_name:
-    default: cloudify-manager3.3.1-server
+    default: cloudify-manager-server
     type: string
 
   ssh_user:
@@ -75,7 +76,7 @@ inputs:
     type: string
 
   ssh_key_filename:
-    default: ~/.ssh/cloudify-manager3.3.1-kp.pem
+    default: ~/.ssh/cloudify-manager-kp.pem
     type: string
 
   agent_private_key_path:
@@ -103,7 +104,7 @@ inputs:
     type: string
 
   manager_security_group_name:
-    default: cloudify-sg-manager3.3.1
+    default: cloudify-sg-manager
     type: string
 
   agents_security_group_name:
@@ -111,7 +112,7 @@ inputs:
     type: string
 
   manager_port_name:
-    default: cloudify-manager3.3.1-port
+    default: cloudify-manager-port
     type: string
 
   #############################
@@ -144,107 +145,107 @@ inputs:
   # agent installer to identify it for your distro and release automatically.
   agent_package_urls:
     default:
-      ubuntu_trusty_agent: http://repository.cloudifysource.org/org/cloudify3/3.3.1/sp-RELEASE/Ubuntu-trusty-agent_3.3.1-sp-b310.tar.gz
-      ubuntu_precise_agent: http://repository.cloudifysource.org/org/cloudify3/3.3.1/sp-RELEASE/Ubuntu-precise-agent_3.3.1-sp-b310.tar.gz
-      centos_7x_agent: http://repository.cloudifysource.org/org/cloudify3/3.3.1/sp-RELEASE/centos-Core-agent_3.3.1-sp-b310.tar.gz
-      centos_6x_agent: http://repository.cloudifysource.org/org/cloudify3/3.3.1/sp-RELEASE/centos-Final-agent_3.3.1-sp-b310.tar.gz
-      redhat_7x_agent: http://repository.cloudifysource.org/org/cloudify3/3.3.1/sp-RELEASE/redhat-Maipo-agent_3.3.1-sp-b310.tar.gz
-      redhat_6x_agent: http://repository.cloudifysource.org/org/cloudify3/3.3.1/sp-RELEASE/redhat-Santiago-agent_3.3.1-sp-b310.tar.gz
-      cloudify_windows_agent: http://repository.cloudifysource.org/org/cloudify3/3.3.1/sp-RELEASE/cloudify-windows-agent_3.3.1-sp-b310.exe
+      ubuntu_trusty_agent: XXXhttp://10.60.0.12:8000/Ubuntu-trusty-agent_3.3.1-sp-b310.tar.gz
+      ubuntu_precise_agent: XXXhttp://10.60.0.12:8000/Ubuntu-precise-agent_3.3.1-sp-b310.tar.gz
+      centos_7x_agent: XXXhttp://10.60.0.12:8000/centos-Core-agent_3.3.1-sp-b310.tar.gz
+      centos_6x_agent: XXXhttp://10.60.0.12:8000/centos-Final-agent_3.3.1-sp-b310.tar.gz
+      redhat_7x_agent: XXXhttp://10.60.0.12:8000/redhat-Maipo-agent_3.3.1-sp-b310.tar.gz
+      redhat_6x_agent: XXXhttp://10.60.0.12:8000/redhat-Santiago-agent_3.3.1-sp-b310.tar.gz
+      cloudify_windows_agent: XXXhttp://10.60.0.12:8000/cloudify-windows-agent_3.3.1-sp-b310.exe
 
   #############################
   # Cloudify Modules
   #############################
   rest_service_rpm_source_url:
     type: string
-    default: http://repository.cloudifysource.org/org/cloudify3/3.3.1/sp-RELEASE/cloudify-rest-service-3.3.1-sp_b310.x86_64.rpm
+    default: XXXhttp://10.60.0.12:8000/cloudify-rest-service-3.3.1-sp_b310.x86_64.rpm
 
   management_worker_rpm_source_url:
     type: string
-    default: http://repository.cloudifysource.org/org/cloudify3/3.3.1/sp-RELEASE/cloudify-management-worker-3.3.1-sp_b310.x86_64.rpm
+    default: XXXhttp://10.60.0.12:8000/cloudify-management-worker-3.3.1-sp_b310.x86_64.rpm
 
   amqpinflux_rpm_source_url:
     type: string
-    default: http://repository.cloudifysource.org/org/cloudify3/3.3.1/sp-RELEASE/cloudify-amqp-influx-3.3.1-sp_b310.x86_64.rpm
+    default: XXXhttp://10.60.0.12:8000/cloudify-amqp-influx-3.3.1-sp_b310.x86_64.rpm
 
   cloudify_resources_url:
     type: string
-    default: https://github.com/cloudify-cosmo/cloudify-manager3.3.1/archive/3.3.1.tar.gz
+    default: XXXhttp://10.60.0.12:8000/3.3.1.tar.gz
 
   webui_source_url:
     type: string
-    default: http://repository.cloudifysource.org/org/cloudify3/3.3.1/sp-RELEASE/cloudify-ui-3.3.1-sp-b310.tgz
+    default: XXXhttp://10.60.0.12:8000/cloudify-ui-3.3.1-sp-b310.tgz
 
   # This is a Cloudify specific redistribution of Grafana.
   grafana_source_url:
     type: string
-    default: http://repository.cloudifysource.org/org/cloudify3/components/grafana-1.9.0.tgz
+    default: XXXhttp://10.60.0.12:8000/grafana-1.9.0.tgz
 
   #############################
   # External Components
   #############################
   pip_source_rpm_url:
     type: string
-    default: http://repository.cloudifysource.org/org/cloudify3/components/python-pip-7.1.0-1.el7.noarch.rpm
+    default: XXXhttp://10.60.0.12:8000/python-pip-7.1.0-1.el7.noarch.rpm
 
   java_source_url:
     type: string
-    default: http://repository.cloudifysource.org/org/cloudify3/components/jre1.8.0_45-1.8.0_45-fcs.x86_64.rpm
+    default: XXXhttp://10.60.0.12:8000/jre1.8.0_45-1.8.0_45-fcs.x86_64.rpm
 
   erlang_source_url:
     type: string
-    default: http://repository.cloudifysource.org/org/cloudify3/components/erlang-17.4-1.el6.x86_64.rpm
+    default: XXXhttp://10.60.0.12:8000/erlang-17.4-1.el6.x86_64.rpm
 
   rabbitmq_source_url:
     type: string
-    default: http://repository.cloudifysource.org/org/cloudify3/components/rabbitmq-server-3.5.3-1.noarch.rpm
+    default: XXXhttp://10.60.0.12:8000/rabbitmq-server-3.5.3-1.noarch.rpm
 
   elasticsearch_source_url:
     type: string
-    default: http://repository.cloudifysource.org/org/cloudify3/components/elasticsearch-1.6.0.noarch.rpm
+    default: XXXhttp://10.60.0.12:8000/elasticsearch-1.6.0.noarch.rpm
 
   elasticsearch_curator_rpm_source_url:
     type: string
-    default: http://repository.cloudifysource.org/org/cloudify3/components/elasticsearch-curator-3.2.3-1.x86_64.rpm
+    default: XXXhttp://10.60.0.12:8000/elasticsearch-curator-3.2.3-1.x86_64.rpm
 
   logstash_source_url:
     type: string
-    default: http://repository.cloudifysource.org/org/cloudify3/components/logstash-1.5.0-1.noarch.rpm
+    default: XXXhttp://10.60.0.12:8000/logstash-1.5.0-1.noarch.rpm
 
   nginx_source_url:
     type: string
-    default: http://repository.cloudifysource.org/org/cloudify3/components/nginx-1.8.0-1.el7.ngx.x86_64.rpm
+    default: XXXhttp://10.60.0.12:8000/nginx-1.8.0-1.el7.ngx.x86_64.rpm
 
   influxdb_source_url:
     type: string
-    default: http://repository.cloudifysource.org/org/cloudify3/components/influxdb-0.8.8-1.x86_64.rpm
+    default: XXXhttp://10.60.0.12:8000/influxdb-0.8.8-1.x86_64.rpm
 
   langohr_source_url:
     type: string
-    default: http://repository.cloudifysource.org/org/cloudify3/components/langohr.jar
+    default: XXXhttp://10.60.0.12:8000/langohr.jar
 
   daemonize_source_url:
     type: string
-    default: http://repository.cloudifysource.org/org/cloudify3/components/daemonize-1.7.3-7.el7.x86_64.rpm
+    default: XXXhttp://10.60.0.12:8000/daemonize-1.7.3-7.el7.x86_64.rpm
 
   riemann_source_url:
     type: string
-    default: http://repository.cloudifysource.org/org/cloudify3/components/riemann-0.2.6-1.noarch.rpm
+    default: XXXhttp://10.60.0.12:8000/riemann-0.2.6-1.noarch.rpm
 
   nodejs_source_url:
     type: string
-    default: http://repository.cloudifysource.org/org/cloudify3/components/node-v0.10.35-linux-x64.tar.gz
+    default: XXXhttp://10.60.0.12:8000/node-v0.10.35-linux-x64.tar.gz
 
   #############################
   # RabbitMQ Inputs
   #############################
   rabbitmq_endpoint_ip:
     description: >
-      Location of the rabbit server. If blank, the manager3.3.1 IP will be used.
+      Location of the rabbit server. If blank, the manager IP will be used.
       Note that if this is set, the external rabbit service must already exist with the appropriate
       credentials and configuration.
-      If this is set, rabbit will not be installed on the manager3.3.1. This may have security implications
-      if you are using SSL for rabbit as some normally internal (to the manager3.3.1) traffic is not currently
+      If this is set, rabbit will not be installed on the manager. This may have security implications
+      if you are using SSL for rabbit as some normally internal (to the manager) traffic is not currently
       encrypted.
     type: string
     default: ''
@@ -401,25 +402,25 @@ inputs:
   #############################
   plugin_resources:
     description: >
-      Holds any archives that should be uploaded to the manager3.3.1.
+      Holds any archives that should be uploaded to the manager.
     default:
-      - 'http://repository.cloudifysource.org/org/cloudify3/3.3.1/sp-RELEASE/cloudify_openstack_plugin-1.3.1-py27-none-linux_x86_64-centos-Core.wgn'
-      - 'http://repository.cloudifysource.org/org/cloudify3/3.3.1/sp-RELEASE/cloudify_fabric_plugin-1.3.1-py27-none-linux_x86_64-centos-Core.wgn'
-      - 'http://repository.cloudifysource.org/org/cloudify3/3.3.1/sp-RELEASE/cloudify_diamond_plugin-1.3.1-py27-none-linux_x86_64-redhat-Maipo.wgn'
-      - 'http://repository.cloudifysource.org/org/cloudify3/3.3.1/sp-RELEASE/cloudify_diamond_plugin-1.3.1-py27-none-linux_x86_64-centos-Core.wgn'
-      - 'http://repository.cloudifysource.org/org/cloudify3/3.3.1/sp-RELEASE/cloudify_diamond_plugin-1.3.1-py26-none-linux_x86_64-centos-Final.wgn'
-      - 'http://repository.cloudifysource.org/org/cloudify3/3.3.1/sp-RELEASE/cloudify_diamond_plugin-1.3.1-py27-none-linux_x86_64-Ubuntu-precise.wgn'
-      - 'http://repository.cloudifysource.org/org/cloudify3/3.3.1/sp-RELEASE/cloudify_diamond_plugin-1.3.1-py27-none-linux_x86_64-Ubuntu-trusty.wgn'
+      - 'http://10.60.0.12:8000/cloudify_openstack_plugin-1.3.1-py27-none-linux_x86_64-centos-Core.wgn'
+      - 'http://10.60.0.12:8000/cloudify_fabric_plugin-1.3.1-py27-none-linux_x86_64-centos-Core.wgn'
+      - 'http://10.60.0.12:8000/cloudify_diamond_plugin-1.3.1-py27-none-linux_x86_64-redhat-Maipo.wgn'
+      - 'http://10.60.0.12:8000/cloudify_diamond_plugin-1.3.1-py27-none-linux_x86_64-centos-Core.wgn'
+      - 'http://10.60.0.12:8000/cloudify_diamond_plugin-1.3.1-py26-none-linux_x86_64-centos-Final.wgn'
+      - 'http://10.60.0.12:8000/cloudify_diamond_plugin-1.3.1-py27-none-linux_x86_64-Ubuntu-precise.wgn'
+      - 'http://10.60.0.12:8000/cloudify_diamond_plugin-1.3.1-py27-none-linux_x86_64-Ubuntu-trusty.wgn'
 
   dsl_resources:
     description: >
       Holds a set of dsl required resources
     default:
-      - {'source_path': 'http://www.getcloudify.org/spec/openstack-plugin/1.3.1/plugin.yaml', 'destination_path': '/spec/openstack-plugin/1.3.1/plugin.yaml'}
+      - {'source_path': 'XXXhttp://10.60.0.12:8000/openstack-plugin.yaml', 'destination_path': '/spec/openstack-plugin/1.3.1/plugin.yaml'}
 
-      - {'source_path': 'http://www.getcloudify.org/spec/fabric-plugin/1.3.1/plugin.yaml', 'destination_path': '/spec/fabric-plugin/1.3.1/plugin.yaml'}
-      - {'source_path': 'http://www.getcloudify.org/spec/diamond-plugin/1.3.1/plugin.yaml', 'destination_path': '/spec/diamond-plugin/1.3.1/plugin.yaml'}
-      - {'source_path': 'http://www.getcloudify.org/spec/cloudify/3.3.1/types.yaml', 'destination_path': '/spec/cloudify/3.3.1/types.yaml'}
+      - {'source_path': 'XXXhttp://10.60.0.12:8000/fabric-plugin.yaml', 'destination_path': '/spec/fabric-plugin/1.3.1/plugin.yaml'}
+      - {'source_path': 'XXXhttp://10.60.0.12:8000/diamond-plugin.yaml', 'destination_path': '/spec/diamond-plugin/1.3.1/plugin.yaml'}
+      - {'source_path': 'XXXhttp://10.60.0.12:8000/cloudify-types.yaml', 'destination_path': '/spec/cloudify/3.3.1/types.yaml'}
 
   #############################
   # Dev Inputs
@@ -480,9 +481,15 @@ dsl_definitions:
     region: { get_input: region }
     nova_url: { get_input: nova_url }
     neutron_url: { get_input: neutron_url }
+    cacert: { get_input: cacert_key }
+    custom_configuration:
+        nova_client:
+           insecure: true
+        neutron_client:
+           insecure: true
 
 ######################################################################
-# These nodes comprise the manager3.3.1's infrastructure and components
+# These nodes comprise the manager's infrastructure and components
 ######################################################################
 node_templates:
 
@@ -528,11 +535,11 @@ node_templates:
           start_timeout: 30
 
         # Declare rules for the default import resolver
-        # which enables using the manager3.3.1 in offline mode.
+        # which enables using the manager in offline mode.
         # The resolver replaces an import's http link with the local path
-        # on the manager3.3.1 according to the matching rule's value.
+        # on the manager according to the matching rule's value.
         # If the resolver cannot read the import from the specified local path
-        # (e.g. when the manager3.3.1 is not in offline mode),
+        # (e.g. when the manager is not in offline mode),
         # it will fall back to the original http link.
         import_resolver:
           parameters:
@@ -548,18 +555,19 @@ node_templates:
         configure:
           implementation: fabric.fabric_plugin.tasks.run_task
           inputs:
-            tasks_file: components/manager3.3.1/scripts/openstack/configure.py
+            tasks_file: components/manager/scripts/openstack/configure.py
             task_name: configure
             task_properties:
               openstack_config: *openstack_configuration
             fabric_env: &manager_fabric_env
               user: { get_input: ssh_user }
               key_filename: { get_property: [management_keypair, private_key_path] }
-              host_string: { get_attribute: [manager_server_ip, floating_ip_address] }
+              host_string: { get_attribute: [manager_port, fixed_ip_address] }
+#              host_string: { get_attribute: [manager_server_ip, floating_ip_address] }
         create:
           implementation: fabric.fabric_plugin.tasks.run_script
           inputs:
-            script_path: components/manager3.3.1/scripts/configure_manager.sh
+            script_path: components/manager/scripts/configure_manager.sh
             fabric_env:
               <<: *manager_fabric_env
               always_use_pty: true
@@ -570,9 +578,10 @@ node_templates:
         target_interfaces:
           cloudify.interfaces.relationship_lifecycle:
             postconfigure:
-             implementation: components/manager3.3.1/scripts/set_manager_public_ip.py
+             implementation: components/manager/scripts/set_manager_public_ip.py
              inputs:
-              public_ip: { get_attribute: [manager_server_ip, floating_ip_address] }
+              public_ip: { get_attribute: [manager_port, fixed_ip_address] }
+#              public_ip: { get_attribute: [manager_server_ip, floating_ip_address] }
 
   management_keypair:
     type: cloudify.openstack.nodes.KeyPair
@@ -593,17 +602,18 @@ node_templates:
   management_network:
     type: cloudify.openstack.nodes.Network
     properties:
+#      use_external_resource: true
       resource_id: { get_input: management_network_name }
       openstack_config: *openstack_configuration
 
   management_subnet:
     type: cloudify.openstack.nodes.Subnet
     properties:
+#      use_external_resource: true
       resource_id: { get_input: management_subnet_name }
       subnet:
-        dns_nameservers: [8.8.8.8]
         ip_version: 4
-        cidr: 10.67.79.0/24
+        cidr: 172.10.1.0/24
       openstack_config: *openstack_configuration
     relationships:
       - target: management_network
@@ -614,6 +624,7 @@ node_templates:
   manager_port:
     type: cloudify.openstack.nodes.Port
     properties:
+#      use_external_resource: true
       openstack_config: *openstack_configuration
       resource_id: { get_input: manager_port_name }
     relationships:
@@ -627,6 +638,7 @@ node_templates:
   router:
     type: cloudify.openstack.nodes.Router
     properties:
+      use_external_resource: true
       resource_id: { get_input: management_router }
       openstack_config: *openstack_configuration
     relationships:
@@ -667,19 +679,19 @@ node_templates:
         - port: 22
           remote_ip_prefix: 0.0.0.0/0
         - port: 8101
-          remote_ip_prefix: { get_property: [management_subnet, subnet, cidr] }
+          remote_ip_prefix: 0.0.0.0/0 #{ get_property: [management_subnet, subnet, cidr] }
         - port: 5672
-          remote_ip_prefix: { get_property: [management_subnet, subnet, cidr] }
+          remote_ip_prefix: 0.0.0.0/0 #{ get_property: [management_subnet, subnet, cidr] }
         - port: 53229
-          remote_ip_prefix: { get_property: [management_subnet, subnet, cidr] }
+          remote_ip_prefix: 0.0.0.0/0 #{ get_property: [management_subnet, subnet, cidr] }
       openstack_config: *openstack_configuration
 
-  manager_server_ip:
-    type: cloudify.openstack.nodes.FloatingIP
-    properties:
-      floatingip:
-        floating_network_name: { get_input: external_network_name }
-      openstack_config: *openstack_configuration
+#  manager_server_ip:
+#    type: cloudify.openstack.nodes.FloatingIP
+#    properties:
+#      floatingip:
+#        floating_network_name: { get_input: external_network_name }
+#      openstack_config: *openstack_configuration
 
   manager_host:
     type: cloudify.openstack.nodes.Server
@@ -692,18 +704,22 @@ node_templates:
       management_network_name: { get_property: [management_network, resource_id] }
       openstack_config: *openstack_configuration
     relationships:
-      - target: manager_server_ip
-        type: cloudify.openstack.server_connected_to_floating_ip
+#      - target: manager_server_ip
+      - target: manager_port
+#        type: cloudify.openstack.server_connected_to_floating_ip
+        type: cloudify.openstack.server_connected_to_port
         source_interfaces:
           cloudify.interfaces.relationship_lifecycle:
             postconfigure:
-             implementation: components/manager3.3.1/scripts/set_manager_public_ip.py
+             implementation: components/manager/scripts/set_manager_public_ip.py
              inputs:
-              public_ip: { get_attribute: [manager_server_ip, floating_ip_address] }
+               public_ip: { get_attribute: [manager_port, fixed_ip_address] }
+#               public_ip: { get_attribute: [manager_server_ip, floating_ip_address] }
+
       - target: management_keypair
         type: cloudify.openstack.server_connected_to_keypair
-      - target: manager_port
-        type: cloudify.openstack.server_connected_to_port
+#      - target: manager_port
+#        type: cloudify.openstack.server_connected_to_port
 
   # #####################################################################
   # The Python and Java nodes are used to provide runtime environments
@@ -715,13 +731,13 @@ node_templates:
   # entities.
   # #####################################################################
   python_runtime:
-    type: manager3.3.1.nodes.PythonRuntime
+    type: manager.nodes.PythonRuntime
     relationships:
       - type: cloudify.relationships.contained_in
         target: manager_host
 
   java_runtime:
-    type: manager3.3.1.nodes.JavaRuntime
+    type: manager.nodes.JavaRuntime
     relationships:
       - type: cloudify.relationships.contained_in
         target: manager_host
@@ -730,13 +746,13 @@ node_templates:
   # These are the nodes comprising the Cloudify Manager's components
   ######################################################################
   rabbitmq:
-    type: manager3.3.1.nodes.RabbitMQ
+    type: manager.nodes.RabbitMQ
     relationships:
       - type: cloudify.relationships.contained_in
         target: manager_host
 
   elasticsearch:
-    type: manager3.3.1.nodes.Elasticsearch
+    type: manager.nodes.Elasticsearch
     relationships:
       - type: cloudify.relationships.contained_in
         target: manager_host
@@ -744,7 +760,7 @@ node_templates:
         target: java_runtime
 
   logstash:
-    type: manager3.3.1.nodes.Logstash
+    type: manager.nodes.Logstash
     relationships:
       - type: cloudify.relationships.contained_in
         target: manager_host
@@ -754,13 +770,13 @@ node_templates:
         target: elasticsearch
 
   influxdb:
-    type: manager3.3.1.nodes.InfluxDB
+    type: manager.nodes.InfluxDB
     relationships:
       - type: cloudify.relationships.contained_in
         target: manager_host
 
   nginx:
-    type: manager3.3.1.nodes.Nginx
+    type: manager.nodes.Nginx
     relationships:
       - type: cloudify.relationships.contained_in
         target: manager_host
@@ -768,7 +784,7 @@ node_templates:
         target: manager_configuration
 
   riemann:
-    type: manager3.3.1.nodes.Riemann
+    type: manager.nodes.Riemann
     relationships:
       - type: cloudify.relationships.contained_in
         target: manager_host
@@ -780,7 +796,7 @@ node_templates:
         target: nginx
 
   rest_service:
-    type: manager3.3.1.nodes.RestService
+    type: manager.nodes.RestService
     relationships:
       - type: cloudify.relationships.contained_in
         target: manager_host
@@ -794,7 +810,7 @@ node_templates:
         target: rabbitmq
 
   mgmt_worker:
-    type: manager3.3.1.nodes.ManagementWorker
+    type: manager.nodes.ManagementWorker
     relationships:
       - type: cloudify.relationships.contained_in
         target: manager_host
@@ -806,7 +822,7 @@ node_templates:
         target: nginx
 
   amqp_influx:
-    type: manager3.3.1.nodes.AmqpInfluxBroker
+    type: manager.nodes.AmqpInfluxBroker
     relationships:
       - type: cloudify.relationships.contained_in
         target: manager_host
@@ -818,7 +834,7 @@ node_templates:
         target: influxdb
 
   webui:
-    type: manager3.3.1.nodes.WebUI
+    type: manager.nodes.WebUI
     relationships:
       - type: cloudify.relationships.contained_in
         target: manager_host
@@ -829,8 +845,8 @@ node_templates:
 
   ######################################################################
   # Enable this node if you want to have the CLI installed within
-  # the manager3.3.1. This might aid in debugging problems or just
-  # controlling the manager3.3.1 from within itself.
+  # the manager. This might aid in debugging problems or just
+  # controlling the manager from within itself.
   ######################################################################
   # cli:
   #   type: manager.nodes.CLI
@@ -849,4 +865,6 @@ plugins:
 
 outputs:
   manager_ip:
-    value: { get_attribute: [manager_server_ip, floating_ip_address] }
+#    value: { get_attribute: [manager_server_ip, floating_ip_address] }
+    value:  { get_attribute: [manager_port, fixed_ip_address] }
+
