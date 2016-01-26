@@ -1,14 +1,15 @@
 On Image --
 
 configure system central-management
-    set type fortimanager
-    set fmg X.X.X.X
-    set include-default-servers disable
-end
+  set type fortimanager
+  set fmg 10.0.5.90
+  set include-default-servers disable
 
-
-config system autoupdate tunneling
-    set address 192.168.102.2:8080
+  configure server-list
+  edit 1
+      set server-type update
+      set server-address 10.0.5.90
+  next
 end
 
 ------------------------------------
