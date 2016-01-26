@@ -1,30 +1,33 @@
 tosca_definitions_version: cloudify_dsl_1_2
 
 imports:
-    - http://www.getcloudify.org/spec/cloudify/3.3.1/types.yaml
-    - http://www.getcloudify.org/spec/openstack-plugin/1.3.1/plugin.yaml
-    - http://www.getcloudify.org/spec/fabric-plugin/1.3.1/plugin.yaml
+    - http://10.60.0.12:8000/cloudify-types.yaml
+    - http://10.60.0.12:8000/openstack-plugin.yaml
+    - http://10.60.0.12:8000/fabric-plugin.yaml
     - plugins/cloudify-vtm-plugin/plugin.yaml
-    - https://raw.githubusercontent.com/cloudify-examples/cloudify-proxy-plugin/master/plugin.yaml
+    - plugin.yaml
 
 inputs:
 
   agent_user:
     default: admin
   vtm_image:
-    default: ''
+    default: 'e9e86c46-9fd4-445b-ac00-90a7478ead3e'
   flavor:
-    default: ''
+    default: '2'
   agent_password:
     default: admin
-  external_network_name:
-    default: ''
+
+# inpute from composition
   lb_network1:
       type: string
-      description: Network resource id to LB
+      default: lb_network1
+# inpute from composition
   lb_network1_subnet:
       type: string
-      description: Network subnet resource id to LB
+      default: lb_network1_subnet
+
+# inpute from composition
   vm_list:
       type: string
 
@@ -40,11 +43,6 @@ node_types:
 
   vtm.policy.config:
     derived_from: cloudify.nodes.SoftwareComponent
-    interfaces:
-      cloudify.interfaces.lifecycle:
-        configure:
-           implementation: vtm.vtm_plugin.tasks.policy_config
-           executor: central_deployment_agent
 
 node_templates:
 
@@ -57,16 +55,22 @@ node_templates:
     relationships:
       - target: lb_network1_port
         type: cloudify.openstack.server_connected_to_port
-      - target: external_network1
-        type: cloudify.relationships.connected_to
 
   vtmPortConfig:
     type: vtm.port.config
     relationships:
       - target: lb_network1_port
         type: cloudify.relationships.connected_to
+        source_interfaces:
+          cloudify.interfaces.relationship_lifecycle:
+            postconfigure:
+             implementation: vtm.vtm_plugin.tasks.policy_config
+             executor: central_deployment_agent
+             inputs:
+               _vms: { get_input: vm_list }
+
       - target: vtmHost
-        type: cloudify.relationships.contained_in
+          type: cloudify.relationships.contained_in
 
   vtmPolicyConfig:
     type: vtm.policy.config
@@ -74,27 +78,23 @@ node_templates:
       - target: vtmHost
         type: cloudify.relationships.contained_in
 
-#  external network
-
-  external_network:
-    type: cloudify.openstack.nodes.Network
-    properties:
-      resource_id: { get_input: external_network_name }
-      use_external_resource : true
-
 #  LB network
 
   lb_network1:
     type: cloudify.openstack.nodes.Network
     properties:
       resource_id: { get_input: lb_network1 }
-      use_external_resource : true
+      use_external_resource : false
 
-  lb_network1_lb_subnet:
+  lb_network_subnet:
     type: cloudify.openstack.nodes.Subnet
     properties:
       resource_id: { get_input: lb_network1_subnet }
-      use_external_resource : true
+      use_external_resource : false
+      subnet:
+        ip_version: 4
+        cidr: 172.30.0.0/24
+        gateway_ip: 172.30.0.1
     relationships:
       - target: lb_network1
         type: cloudify.relationships.contained_in
