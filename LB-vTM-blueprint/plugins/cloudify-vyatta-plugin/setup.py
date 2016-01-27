@@ -39,7 +39,6 @@ setup(
     ],
     test_requires=[
         "cloudify-dsl-parser>=3.3"
-        "nose"
 
     ]
 )
