@@ -19,8 +19,8 @@ import setuptools
 def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
-with open('test-requirements.txt') as f:
-    test_required = f.read().splitlines()
+#with open('test-requirements.txt') as f:
+#    test_required = f.read().splitlines()
 
 
 setuptools.setup(
@@ -42,6 +42,5 @@ setuptools.setup(
     license='LICENSE',
     install_requires=[
         'cloudify-plugins-common >= 3.2'
-    ],
-    test_requires=test_required,
+    ]
 )

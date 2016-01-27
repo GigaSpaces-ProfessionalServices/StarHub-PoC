@@ -4,7 +4,7 @@ imports:
   - http://10.60.0.12:8000/cloudify-types.yaml
   - http://10.60.0.12:8000/fabric-plugin.yaml
   - http://10.60.0.12:8000/openstack-plugin.yaml
-  - plugin.yaml
+  - plugins/cloudify-proxy-plugin/plugin.yaml
 
 
 inputs:

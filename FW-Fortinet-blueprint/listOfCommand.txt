@@ -1,6 +1,6 @@
 On Image --
 
-configure system central-management
+config system central-management
   set type fortimanager
   set fmg 10.0.5.90
   set include-default-servers disable
@@ -9,14 +9,14 @@ configure system central-management
   edit 1
       set server-type update
       set server-address 10.0.5.90
-  next
+  end
 end
 
 ------------------------------------
 
 * CreateStaticRouting
 
-  configure router static
+  config router static
     edit 1
         set dst  0.0.0.0/24
         set gateway  192.168.122.1

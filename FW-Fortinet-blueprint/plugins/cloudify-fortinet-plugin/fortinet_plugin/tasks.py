@@ -1,4 +1,4 @@
-#from pyFG import FortiOS
+from pyFG import FortiOS
 from cloudify.decorators import operation
 from cloudify.state import ctx_parameters as inputs
 
