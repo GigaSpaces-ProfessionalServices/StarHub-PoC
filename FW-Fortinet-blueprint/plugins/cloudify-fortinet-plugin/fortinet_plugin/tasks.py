@@ -1,6 +1,8 @@
-from pyFG.fortios import FortiOS
+from fortios import FortiOS
+from forticonfig import FortiConfig
 from cloudify.decorators import operation
 from cloudify.state import ctx_parameters as inputs
+
 
 forti_username = 'admin'
 forti_password = 'admin'

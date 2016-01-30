@@ -1,15 +1,13 @@
 # coding=utf-8
 
-from forticonfig import FortiConfig
-
-import exceptions
-import paramiko
-import StringIO
-import re
+import logging
 import os
+import paramiko
+import re
 from difflib import Differ
 
-import logging
+import exceptions
+from forticonfig import FortiConfig
 
 logger = logging.getLogger('pyFG')
 
