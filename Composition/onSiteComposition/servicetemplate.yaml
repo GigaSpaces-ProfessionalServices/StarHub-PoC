@@ -8,19 +8,19 @@ imports:
 
 inputs:
   application_network_name:
-    default: application-network
+    default: Appnetwork
     type: string
 
   application_network_subnet_name:
-    default: application-network-subnet
+    default: Appnetwork-subnet
     type: string
 
   lb_network_name:
-      default: lb-network
+      default: LBnetwork
       type: string
 
   lb_network_subnet_name:
-      default: lb-network-subnet
+      default: LBnetwork-subnet
       type: string
 
   image_id:
@@ -28,7 +28,7 @@ inputs:
     type: string
 
   flavor_id:
-    default: '2'
+    default: '3'
     type: string
 
   lb_blueprint_id:

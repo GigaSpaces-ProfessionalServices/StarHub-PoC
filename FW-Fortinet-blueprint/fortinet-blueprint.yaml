@@ -5,36 +5,40 @@ imports:
     - http://10.60.0.12:8000/openstack-plugin.yaml
     - http://10.60.0.12:8000/fabric-plugin.yaml
     - plugins/cloudify-fortinet-plugin/plugin.yaml
-##    - plugin.yaml
 
 inputs:
 
   agent_user:
     default: admin
+
   fortinet_image:
     default: 'd9648527-6d9b-468c-9d5d-4fdf235c20be'
+
   flavor:
-    default: '2'
+    default: '3'
+
   agent_password:
     default: admin
 
 # inpute from composition
-  lb_network1:
+  lb_network:
       type: string
-      default: lb_network1
-# inpute from composition
-  lb_network1_subnet:
-      type: string
-      default: lb_network1_subnet
+      default: LBnetwork
 
 # inpute from composition
-  app_network2:
-        type: string
-      default: app_network2
-# inpute from composition
-  app_network2_subnet:
+  lb_network_subnet:
       type: string
-      default: app_network2_subnet
+      default: LBnetwork_subnet
+
+# inpute from composition
+  app_network:
+        type: string
+      default: APPnetwork
+
+# inpute from composition
+  app_network_subnet:
+      type: string
+      default: APPnetwork_subnet
 
 node_types:
 
@@ -63,17 +67,17 @@ node_templates:
       image: { get_input: fortinet_image }
       flavor: { get_input: flavor }
     relationships:
-      - target: lb_network1_port
+      - target: lb_network_port
         type: cloudify.openstack.server_connected_to_port
-      - target: app_network2_port
+      - target: app_network_port
         type: cloudify.openstack.server_connected_to_port
 
   FortinetPortConfig:
     type: fortinet.port.config
     relationships:
-      - target: lb_network1_port
+      - target: lb_network_port
         type: cloudify.openstack.server_connected_to_port
-      - target: app_network2_port
+      - target: app_network_port
         type: cloudify.openstack.server_connected_to_port
       - target: FortinetHost
         type: cloudify.relationships.contained_in
@@ -87,44 +91,44 @@ node_templates:
 
 #  LB network
 
-  lb_network1:
+  lb_network:
     type: cloudify.openstack.nodes.Network
     properties:
-      resource_id: { get_input: lb_network1 }
+      resource_id: { get_input: lb_network }
       use_external_resource : false
 
   lb_network_subnet:
     type: cloudify.openstack.nodes.Subnet
     properties:
-      resource_id: { get_input: lb_network1_subnet }
+      resource_id: { get_input: lb_network_subnet }
       use_external_resource : false
       subnet:
         ip_version: 4
         cidr: 172.30.0.0/24
         gateway_ip: 172.30.0.1
     relationships:
-      - target: lb_network1
+      - target: lb_network
         type: cloudify.relationships.contained_in
 
-  lb_network1_port:
+  lb_network_port:
     type: cloudify.openstack.nodes.Port
     properties:
       use_external_resource : false
     relationships:
       - type: cloudify.relationships.contained_in
-        target: lb_network1
+        target: lb_network
       - type: cloudify.relationships.depends_on
-        target: lb_network1_subnet
+        target: lb_network_subnet
 
 #  APP network
 
-  app_network2:
+  app_network:
     type: cloudify.openstack.nodes.Network
     properties:
-      resource_id: { get_input: app_network2 }
+      resource_id: { get_input: app_network }
       use_external_resource : false
 
-  app_network2_subnet:
+  app_network_subnet:
     type: cloudify.openstack.nodes.Subnet
     properties:
       resource_id: { get_input: app_network_subnet }
@@ -134,16 +138,16 @@ node_templates:
         cidr: 172.20.0.0/29
         gateway_ip: 172.20.0.1
     relationships:
-      - target: app_network2
+      - target: app_network
         type: cloudify.relationships.contained_in
 
-  app_network2_port:
+  app_network_port:
     type: cloudify.openstack.nodes.Port
     properties:
       use_external_resource : false
     relationships:
       - type: cloudify.relationships.contained_in
-        target: app_network2
+        target: app_network
       - type: cloudify.relationships.depends_on
-        target: app_network2_subnet
+        target: app_network_subnet
 

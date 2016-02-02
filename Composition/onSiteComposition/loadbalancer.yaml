@@ -13,14 +13,14 @@ inputs:
       type: string
       
   flavor_id:
-      default: '2'
+      default: '3'
       type: string
 
-  lb_network1:
+  lb_network:
       type: string
       description: LB Network resource id attached to
 
-  lb_network1_subnet:
+  lb_network_subnet:
       type: string
       description: LB Network resource id attached to
 
