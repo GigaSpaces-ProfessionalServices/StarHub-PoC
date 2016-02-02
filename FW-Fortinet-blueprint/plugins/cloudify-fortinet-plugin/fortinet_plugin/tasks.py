@@ -104,28 +104,58 @@ def policy_local_config(ctx, **kwargs):
 
 
 @operation
-def policy_config(ctx, **kwargs):
-    ctx.logger.info('Start policy task....')
+def fw_config(ctx, **kwargs):
+    ctx.logger.info('Start fw configuration....')
 
     fortinet_host_ip = get_host_ip(ctx)
     ctx.logger.info('Fortinet_host_ip: {0}'.format(fortinet_host_ip))
 
+    gateway = inputs['gateway']
+    set_policy(ctx, fortinet_host_ip, gateway)
+
     set_policy(ctx, fortinet_host_ip)
 
 
-def set_policy(ctx, fortinet_host_ip):
+def set_policy(ctx, fortinet_host_ip, gateway) :
+
+    command = \
+        'config router static\n' \
+        '   edit 1\n' \
+        '       set dst  0.0.0.0/24\n' \
+        '       set gateway  %s\n' \
+        '       set device port2\n' \
+        'end' % gateway
+
+    exec_command(ctx, command, fortinet_host_ip)
+
+    command = \
+        'configure firewall address\n' \
+        '   edit rule1\n' \
+        '       set subnet %s/24\n' \
+        '       set associated-interface port2\n' \
+        'end' % gateway
+
+    exec_command(ctx, command, fortinet_host_ip)
+
+    command = \
+        'config firewall service custom\n' \
+        '   edit firewallServer\n' \
+        '       set protocol "TCP"\n' \
+        '       set tcp-portrange 50-1000\n' \
+        'end'
+
+    exec_command(ctx, command, fortinet_host_ip)
 
     command = \
         'config firewall policy\n' \
         '  edit 1\n' \
-        '    set srcintf \"port3\"\n' \
-        '    set dstintf \"port2\"\n' \
+        '    set srcintf \"port2\"\n' \
+        '    set dstintf \"port3\"\n' \
         '    set srcaddr \"all\"\n' \
         '    set dstaddr \"all\"\n' \
         '    set action accept\n' \
         '    set schedule \"always\"\n' \
-        '    set service \"HTTP\"\n' \
-        '    set nat disable\n' \
+        '    set service \"firewallServer\"\n' \
         '  next\n' \
         'end'
 

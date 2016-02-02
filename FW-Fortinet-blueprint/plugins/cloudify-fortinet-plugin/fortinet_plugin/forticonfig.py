@@ -18,7 +18,7 @@ class FortiConfig(object):
             end
 
 
-        It can contain parameters and sub_blocks.
+        It cn contain parameters and sub_blocks.
 
         Args:
             * **name** (string) -- The path for the current block, for example *system interface*

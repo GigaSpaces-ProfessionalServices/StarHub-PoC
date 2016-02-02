@@ -51,7 +51,7 @@ node_types:
     interfaces:
       cloudify.interfaces.lifecycle:
         configure:
-           implementation: fortinet.fortinet_plugin.tasks.policy_config
+           implementation: fortinet.fortinet_plugin.tasks.fw_config
            executor: central_deployment_agent
 
 node_templates:
