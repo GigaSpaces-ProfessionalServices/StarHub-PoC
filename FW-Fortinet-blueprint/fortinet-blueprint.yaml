@@ -32,7 +32,7 @@ inputs:
 
 # inpute from composition
   app_network:
-        type: string
+      type: string
       default: APPnetwork
 
 # inpute from composition

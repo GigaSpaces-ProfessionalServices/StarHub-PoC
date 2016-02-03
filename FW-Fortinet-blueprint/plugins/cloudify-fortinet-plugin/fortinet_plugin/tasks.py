@@ -143,8 +143,7 @@ def exec_command(ctx, command, fortinet_host_ip):
 
     ctx.logger.info('Open connection to host {0} '.format(fortinet_host_ip))
 
-#    conn = FortiOS(fortinet_host_ip, username=forti_username, password=forti_password)
-    conn = FortiOS(fortinet_host_ip, username=forti_username)
+    conn = FortiOS(fortinet_host_ip, username=forti_username, password=forti_password)
     conn.open()
     ctx.logger.info("Connection OK")
 
