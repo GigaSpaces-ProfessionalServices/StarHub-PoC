@@ -1,9 +1,9 @@
 from pyFG import FortiOS
 
 forti_username = 'admin'
-forti_password = 'admin'
+forti_password = 'password'
 portMask = '255.255.255.0'
-host_ip = '172.10.1.23'
+host_ip = '192.168.122.146'
 
 
 def port_config():
@@ -46,8 +46,8 @@ def fw_config():
     print('Fortinet_host_ip: {0}'.format(fortinet_host_ip))
     gateway = '10.10.10.1'
 
-    command = 'execute update-now'
-    exec_command(command, fortinet_host_ip)
+    #command = 'execute update-now'
+    #exec_command(command, fortinet_host_ip)
 
     command = \
         'config router static\n' \
@@ -106,7 +106,7 @@ def exec_command(command, fortinet_host_ip):
 
 if __name__ == "__main__":
 
-    port_config()
+    #port_config()
 
-    #fw_config()
+    fw_config()
 
