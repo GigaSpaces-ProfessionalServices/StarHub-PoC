@@ -17,7 +17,8 @@ inputs:
 
   vtm_image:
     #default: 'e9e86c46-9fd4-445b-ac00-90a7478ead3e' # basic
-    default: '3bb90b02-37f3-4ddb-ba5f-02d2d96221d9' # snapshot
+    default: '8e2e6383-e354-4092-ad06-dd6fd1331dd7' # snapshot vTM_CFY_VN
+
 
   flavor:
     default: '3'

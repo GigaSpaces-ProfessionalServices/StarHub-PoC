@@ -16,7 +16,7 @@ inputs:
     default: admin
 
   fortinet_image:
-    default: '77379bce-8fbc-4e90-8570-6e873055f06b' # snapshot
+    default: '3d8edfea-f1ba-44cc-93f2-5339ca875d9a' # snapshot FortiGate_3.2_CFY_VNF
 #   default: 'd9648527-6d9b-468c-9d5d-4fdf235c20be' # original
 
   flavor:
@@ -77,16 +77,24 @@ node_templates:
       flavor: { get_input: flavor }
     relationships:
 
-# app reference to port3
-      - target: app_network_port
-        type: cloudify.openstack.server_connected_to_port
 # lb reference to port2
-      - target: lb_network_port
-        type: cloudify.openstack.server_connected_to_port
+#      - target: lb_network_port
+#        type: cloudify.openstack.server_connected_to_port
+
+# app reference to port3
+#      - target: app_network_port
+#        type: cloudify.openstack.server_connected_to_port
+
+      - target: app_network
+        type: cloudify.relationships.connected_to 
+
+      - target: lb_network
+        type: cloudify.relationships.connected_to
 
       - target: server_float_ip
         type: cloudify.openstack.server_connected_to_floating_ip
 
+                      
 #  FortinetPortConfig:
 #    type: fortinet.port.config
 #    relationships:
@@ -172,3 +180,8 @@ node_templates:
       floatingip:
         floating_network_name: { get_input: external_network_name }
 
+outputs:
+  firewall_netip:
+    value:
+      fw_ip2: { get_attribute: [ app_network_port, fixed_ip_address ]}
+      lb_ip: { get_attribute: [ lb_network_port, fixed_ip_address ]}
