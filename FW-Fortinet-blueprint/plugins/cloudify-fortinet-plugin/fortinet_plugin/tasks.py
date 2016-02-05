@@ -6,6 +6,7 @@ forti_username = 'admin'
 forti_password = 'admin'
 portMask = '255.255.255.0'
 
+
 @operation
 def port_config(ctx, **kwargs):
     ctx.logger.info('Start port config task....')
@@ -32,12 +33,12 @@ def set_port(ctx, fortinet_host_ip, target_ip, port_id, port_alias):
 
     command = \
         'config system interface\n' \
-        '   edit port%s\n' \
-        '       set mode static\n' \
-        '       set allowaccess ping http https\n' \
-        '       set alias %s\n' \
-        '       set ip %s %s\n' \
-        '   next\n' \
+        '  edit port%s\n' \
+        '    set mode static\n' \
+        '    set allowaccess ping http https\n' \
+        '    set alias %s\n' \
+        '    set ip %s %s\n' \
+        '  next\n' \
         'end' % (port_id, port_alias, target_ip, portMask)
 
     exec_command(ctx, command, fortinet_host_ip)
@@ -61,9 +62,9 @@ def set_policy(ctx, fortinet_host_ip) :
     command = \
         'config router static\n' \
         '   edit 1\n' \
-        '       set dst  0.0.0.0/24\n' \
-        '       set gateway  %s\n' \
-        '       set device port2\n' \
+        '     set dst  0.0.0.0/24\n' \
+        '     set gateway  %s\n' \
+        '     set device port2\n' \
         'end' % gateway
 
     exec_command(ctx, command, fortinet_host_ip)
@@ -142,12 +143,11 @@ def set_route(ctx, fortinet_host_ip, gateway, target_ip, portMask, port_id):
 def exec_command(ctx, command, fortinet_host_ip):
 
     ctx.logger.info('Open connection to host {0} '.format(fortinet_host_ip))
-
     conn = FortiOS(fortinet_host_ip, username=forti_username, password=forti_password)
     conn.open()
-    ctx.logger.info("Connection OK")
 
     ctx.logger.info("Execute Command >> \n {0}".format(command))
+
     conn.execute_command(command)
     conn.close()
 
@@ -184,3 +184,4 @@ def get_host_ip(ctx):
 def get_host_id(ctx):
     ctx.instance._get_node_instance_if_needed()
     return ctx.instance._node_instance.host_id
+

@@ -1,34 +1,28 @@
-#!/bin/bash
+#!/bin/bash -v
 
-lbIP=$1
+LBIP=$1
 
 url_basic="https://$LBIP:9070/api/tm"
-rest_header="Content-Type: application/json -u admin:admin -k"
+rest_header="Content-Type:application/json -u admin:admin -k"
 rest_action="-X PUT"
 
-curl -v -H ${rest_header} ${rest_action} \
-    --data "@SetInterfaces.json"
-    ${url_basic}/3.5/config/active/traffic_managers/192.168.122.84
+curl -v -H \"${rest_header}\" ${rest_action} --data "@SetInterfaces-new.json" ${url_basic}/3.5/config/active/traffic_managers/172.30.0.10
 
-curl -v -H ${rest_header} ${rest_action} \
-     --data "@AddPool.json" \
-     ${url_basic}/3.5/config/active/pools/CFY-Pool
+curl -v -H \"${rest_header}\" ${rest_action} --data "@AddPool.json" ${url_basic}/3.5/config/active/pools/CFY-Pool
 
-curl -v -H ${rest_header} ${rest_action} \
-     --data "@CreatingTrafficIPGroup.json" \
-     ${url_basic}/2.0/config/active/traffic_ip_groups/CFY-TIP
+curl -v -H \"${rest_header}\" ${rest_action} --data "@CreatingTrafficIPGroup.json" ${url_basic}/2.0/config/active/traffic_ip_groups/CFY-TIP
 
-curl -v -H ${rest_header} ${rest_action} \
-     --data "@CreateSessionPersistence.json" \
-     ${url_basic}/2.0/config/active/persistence/Persistence
+#curl -v -H ${rest_header} ${rest_action} \
+#     --data "@CreateSessionPersistence.json" \
+#     ${url_basic}/2.0/config/active/persistence/Persistence
 
-curl -v -H ${rest_header} ${rest_action} \
-     --data "@AssigningSessionPersistence.json" \
-     ${url_basic}/3.5/config/active/pools/CFY-Pool
+#curl -v -H ${rest_header} ${rest_action} \
+#     --data "@AssigningSessionPersistence.json" \
+#     ${url_basic}/3.5/config/active/pools/CFY-Pool
 
-curl -v -H ${rest_header} ${rest_action} \
-     --data "@CreatingVirtualServer.json" \
-     ${url_basic}/2.0/config/active/virtual_servers/CFY-VS
+#curl -v -H ${rest_header} ${rest_action} \
+#     --data "@CreatingVirtualServer.json" \
+#     ${url_basic}/2.0/config/active/virtual_servers/CFY-VS
 
 #-------------------------------------------------------------
 

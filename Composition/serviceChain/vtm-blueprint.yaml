@@ -1,5 +1,9 @@
 tosca_definitions_version: cloudify_dsl_1_2
 
+############################################
+# Brocade vTM - traffic managment LB - VNF
+############################################
+
 imports:
     - http://10.60.0.12:8000/cloudify-types.yaml
     - http://10.60.0.12:8000/openstack-plugin.yaml
@@ -29,7 +33,7 @@ inputs:
 # inpute from composition
   lb_network_subnet:
     type: string
-    default: LBnetwork_subnet
+    default: LBnetwork-subnet
 
 # inpute from composition
   vm_list:

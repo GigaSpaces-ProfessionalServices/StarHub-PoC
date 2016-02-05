@@ -13,8 +13,6 @@ config system central-management
 end
 
 ------------------------------------
-execute update-now
-------------------------------------
 
 * CreateStaticRouting
 

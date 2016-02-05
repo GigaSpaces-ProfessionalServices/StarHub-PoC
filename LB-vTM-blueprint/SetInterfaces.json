@@ -31,11 +31,6 @@
           "autoneg": true,
           "mtu": 1500
         },
-        {
-          "name": "eth2",
-          "autoneg": true,
-          "mtu": 1500
-        }
       ],
       "ip": [
         {
@@ -47,12 +42,6 @@
         {
           "name": "eth1",
           "addr": "10.0.2.42",
-          "isexternal": false,
-          "mask": "255.255.255.0"
-        },
-        {
-          "name": "eth2",
-          "addr": "10.0.102.42",
           "isexternal": false,
           "mask": "255.255.255.0"
         }

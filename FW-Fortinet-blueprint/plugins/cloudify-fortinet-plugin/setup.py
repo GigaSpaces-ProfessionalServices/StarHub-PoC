@@ -35,7 +35,7 @@ setup(
     zip_safe=False,
     install_requires=[
         # Necessary dependency for developing plugins, do not remove!
-        "cloudify-plugins-common>=3.3",
-        "pyFG"
+        "cloudify-plugins-common>=3.3.1",
+	"pyFG",
     ]
 )

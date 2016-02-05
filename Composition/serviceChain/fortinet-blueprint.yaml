@@ -1,19 +1,23 @@
 tosca_definitions_version: cloudify_dsl_1_2
 
+##################
+# Fortinet FW VNF
+##################
+
 imports:
     - http://10.60.0.12:8000/cloudify-types.yaml
     - http://10.60.0.12:8000/openstack-plugin.yaml
     - http://10.60.0.12:8000/fabric-plugin.yaml
-#    - plugins/cloudify-vtm-plugin/plugin.yaml
+#    - plugins/cloudify-fortinet-plugin/plugin.yaml
 
 inputs:
 
   agent_user:
     default: admin
 
-  vtm_image:
-    #default: 'e9e86c46-9fd4-445b-ac00-90a7478ead3e' # basic
-    default: '3bb90b02-37f3-4ddb-ba5f-02d2d96221d9' # snapshot
+  fortinet_image:
+    default: '77379bce-8fbc-4e90-8570-6e873055f06b' # snapshot
+#   default: 'd9648527-6d9b-468c-9d5d-4fdf235c20be' # original
 
   flavor:
     default: '3'
@@ -29,78 +33,76 @@ inputs:
 # inpute from composition
   lb_network_subnet:
     type: string
-    default: LBnetwork_subnet
+    default: LBnetwork-subnet
 
 # inpute from composition
-  vm_list:
+  app_network:
     type: string
-    default: '172.20.0.5'
+    default: APPnetwork
+
+# inpute from composition
+  app_network_subnet:
+    type: string
+    default: APPnpetwork-subnet
 
   external_network_name:
     type: string
     default: VIO-External-01_VLAN301
 
-  management_network_name:
-    default: cloudify-management-network
-    type: string
-
-  management_subnet_name:
-    default: cloudify-management-network-subnet
-    type: string
-
 node_types:
 
-  vtm.port.config:
+  fortinet.port.config:
     derived_from: cloudify.nodes.SoftwareComponent
 #    interfaces:
 #      cloudify.interfaces.lifecycle:
 #        configure:
-#           implementation: vtm.vtm_plugin.tasks.port_config
+#           implementation: fortinet.fortinet_plugin.tasks.port_config
 #           executor: central_deployment_agent
 
-  vtm.policy.config:
+  fortinet.policy.config:
     derived_from: cloudify.nodes.SoftwareComponent
+#    interfaces:
+#      cloudify.interfaces.lifecycle:
+#        configure:
+#           implementation: fortinet.fortinet_plugin.tasks.fw_config
+#           executor: central_deployment_agent
 
 node_templates:
 
-  vtmHost:
+  FortinetHost:
     type: cloudify.openstack.nodes.Server
     properties:
       install_agent: false
-      image: { get_input: vtm_image }
+      image: { get_input: fortinet_image }
       flavor: { get_input: flavor }
     relationships:
+
+# app reference to port3
+      - target: app_network_port
+        type: cloudify.openstack.server_connected_to_port
+# lb reference to port2
       - target: lb_network_port
         type: cloudify.openstack.server_connected_to_port
 
-      - target: manager_port
-        type: cloudify.openstack.server_connected_to_port
-
       - target: server_float_ip
-        type: cloudify.openstack.server_connected_to_floating_ip 
+        type: cloudify.openstack.server_connected_to_floating_ip
 
-
-#  vtmPortConfig:
-#    type: vtm.port.config
+#  FortinetPortConfig:
+#    type: fortinet.port.config
 #    relationships:
-#      - target: lb_network1_port
-#        type: cloudify.relationships.connected_to
-#        source_interfaces:
-#          cloudify.interfaces.relationship_lifecycle:
-#            postconfigure:
-#             implementation: vtm.vtm_plugin.tasks.policy_config
-#             executor: central_deployment_agent
-#             inputs:
-#               _vms: { get_input: vm_list }
-#
-#      - target: vtmHost
-#          type: cloudify.relationships.contained_in
-
-#  vtmPolicyConfig:
-#    type: vtm.policy.config
-#    relationships:
-#      - target: vtmHost
+#      - target: lb_network_port
+#        type: cloudify.openstack.server_connected_to_port
+#      - target: app_network_port
+#        type: cloudify.openstack.server_connected_to_port
+#      - target: FortinetHost
 #        type: cloudify.relationships.contained_in
+
+#  FortinetPolicyConfig:
+#    type: fortinet.policy.config
+#    relationships:
+#      - target: FortinetHost
+#        type: cloudify.relationships.contained_in
+
 
 #  LB network
 
@@ -127,44 +129,46 @@ node_templates:
     type: cloudify.openstack.nodes.Port
     properties:
       use_external_resource : false
-      fixed_ip: 172.30.0.10
     relationships:
       - type: cloudify.relationships.contained_in
         target: lb_network
       - type: cloudify.relationships.depends_on
         target: lb_network_subnet
 
+#  APP network
+
+  app_network:
+    type: cloudify.openstack.nodes.Network
+    properties:
+      resource_id: { get_input: app_network }
+      use_external_resource : true
+
+  app_network_subnet:
+    type: cloudify.openstack.nodes.Subnet
+    properties:
+      resource_id: { get_input: app_network_subnet }
+      use_external_resource : true
+      subnet:
+        ip_version: 4
+        cidr: 172.20.0.0/29
+        gateway_ip: 172.20.0.1
+    relationships:
+      - target: app_network
+        type: cloudify.relationships.contained_in
+
+  app_network_port:
+    type: cloudify.openstack.nodes.Port
+    properties:
+      use_external_resource : false
+    relationships:
+      - type: cloudify.relationships.contained_in
+        target: app_network
+      - type: cloudify.relationships.depends_on
+        target: app_network_subnet
+
   server_float_ip:
     type: cloudify.openstack.nodes.FloatingIP
     properties:
       floatingip:
         floating_network_name: { get_input: external_network_name }
-
-  management_network:
-    type: cloudify.openstack.nodes.Network
-    properties:
-      use_external_resource: true
-      resource_id: { get_input: management_network_name }
-
-  management_subnet:
-    type: cloudify.openstack.nodes.Subnet
-    properties:
-      use_external_resource: true
-      resource_id: { get_input: management_subnet_name }
-    relationships:
-      - target: management_network
-        type: cloudify.relationships.contained_in
-
-  manager_port:
-    type: cloudify.openstack.nodes.Port
-    properties:
-      use_external_resource: false
-      fixed_ip: 172.10.1.31
-    relationships:
-      - type: cloudify.relationships.contained_in
-        target: management_network
-      - type: cloudify.relationships.depends_on
-        target: management_subnet
-
-
 
