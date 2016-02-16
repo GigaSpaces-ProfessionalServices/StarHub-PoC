@@ -39,12 +39,12 @@ inputs:
 # inpute from composition
   app_network:
     type: string
-    default: APPnetwork
+    default: Tenant-a-APPnetwork
 
 # inpute from composition
   app_network_subnet:
     type: string
-    default: APPnetwork-subnet
+    default: Tenant-a-APPnetwork-subnet
 
   external_network_name:
     type: string
@@ -55,40 +55,57 @@ inputs:
      type: string 
      default: cloudify-management-network
 
+#node_types:
+#
+#  fortinet.Server:
+#    derived_from: cloudify.openstack.nodes.Server
+#    interfaces:
+#      cloudify.interfaces.lifecycle:
+#        create:
+#          implementation: openstack.nova_plugin.server.create
+#          inputs:
+#            nic_ordering:
+#              default:
+#                - type: network
+#                  name: management_network
+#                - type: network
+#                  name: { get_input: Tenant-a-LBnetwork }
+#                - type: network
+#                  name: { get_input: Tenant-a-APPnetwork }
+
 node_templates:
-  FortinetHost:
-    type: cloudify.openstack.nodes.Server
+
+  FortinetServer:
+    type: fortinet.Server
     properties:
       install_agent: false
       image: { get_input: fortinet_image }
       flavor: { get_input: flavor }
-#    interfaces:
-#      cloudify.interfaces.lifecycle:
-#        create:
-#         inputs:
-#           args:
-#             nics:
-#              - net-id: { get_attribute: [ management_network, external_id ] }
-#              - net-id: { get_attribute: [ lb_network, external_id ] }
-#              - net-id: { get_attribute: [ app_network, external_id ] }
+    interfaces:
+      cloudify.interfaces.lifecycle:
+       create:
+         inputs:
+           args:
+            nics:
+              - net-id: { get_attribute: [ management_network, external_id ] }
+              - net-id: { get_attribute: [ lb_network, external_id ] }
+              - net-id: { get_attribute: [ app_network, external_id ] }
+
 #              - net-id: { get_attribute: [ management_network, external_id ] }
 #              - port-id: { get_attribute: [ lb_network_port, external_id ] }
 #              - port-id: { get_attribute: [ app_network_port, external_id ] }
 
-    relationships:
-
+#    relationships:
 #      - target: app_network
 #        type: cloudify.relationships.connected_to 
-
 #      - target: lb_network
 #        type: cloudify.relationships.connected_to
 
-#
-      - target: lb_network_port
-        type:  cloudify.openstack.server_connected_to_port
 
-      - target: app_network_port
-        type: cloudify.openstack.server_connected_to_port
+#      - target: lb_network_port
+#        type:  cloudify.openstack.server_connected_to_port
+#      - target: app_network_port
+#        type: cloudify.openstack.server_connected_to_port
 
 
 #  fortinet.port.config:
