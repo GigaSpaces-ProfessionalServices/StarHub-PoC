@@ -3,11 +3,16 @@ tosca_definitions_version: cloudify_dsl_1_2
 imports:
   - http://www.getcloudify.org/spec/cloudify/3.3.1/types.yaml
   - http://www.getcloudify.org/spec/fabric-plugin/1.3.1/plugin.yaml
-  - http://www.getcloudify.org/spec/openstack-plugin/1.3.1/plugin.yaml
+#  - http://www.getcloudify.org/spec/openstack-plugin/1.3.1/plugin.yaml
+  - plugins/cloudify-openstack-plugin/plugin.yaml
 
 inputs:
   image_id:
-      default: '13391e9d-ca48-471f-9e1c-0151662a8a60'
+      default: '037e8005-bd8c-42d8-a81b-f004cd96e540'
+      type: string
+
+  web_image_id:
+      default: '74ff4015-aee1-4e02-aaa8-1c77b2650394'
       type: string
 
   flavor_id:
@@ -36,11 +41,20 @@ inputs:
 
   external_network_name:
     type: string
-    default: VIO-External-01_VLAN301
+    default: external
 
   management_network_name:
      type: string
-     default: cloudify-management-network
+     default: cloudify-management-network-3.3.1
+
+  management_subnet_name:
+    default: cloudify-management-network-subnet-3.3.1
+    type: string
+
+node_types:
+
+    port_node_type:
+       derived_from: cloudify.nodes.SoftwareComponent
 
 node_templates:
 
@@ -49,9 +63,9 @@ node_templates:
   fortinetServer:
     type: cloudify.openstack.nodes.Server
     properties:
-      server:
-        image: { get_input: image_id }
-        flavor: { get_input: flavor_id }
+      install_agent: false
+      image:  { get_input: image_id }
+      flavor: { get_input: flavor_id }
     interfaces:
       cloudify.interfaces.lifecycle:
        create:
@@ -59,16 +73,42 @@ node_templates:
            args:
              nics:
                 - net-id: { get_attribute: [ management_network, external_id ] }
-                - net-id: { get_attribute: [ lb_network, external_id ] }
-                - net-id: { get_attribute: [ app_network, external_id ] }
+                - port-id: { get_attribute: [ lb_network_port, external_id ] }
+                - port-id: { get_attribute: [ app_network_port, external_id ] }
 
     relationships:
-      - target: lb_network
-        type: cloudify.relationships.connected_to
-      - target: app_network
-        type: cloudify.relationships.connected_to
+        - target: fortinetPortConfig
+          type: cloudify.relationships.connected_to
+        - target: lb_network_port
+          type: cloudify.relationships.connected_to
+        - target: app_network_port
+          type: cloudify.relationships.connected_to
 
+        - target: server_float_ip
+          type: cloudify.openstack.server_connected_to_floating_ip
 
+  networkConfig:
+    type: cloudify.nodes.Compute
+    properties:
+      install_agent: false
+
+  fortinetPortConfig:
+    type: port_node_type
+    relationships:
+        - target: lb_network_port
+          type: cloudify.relationships.depends_on
+        - target: app_network_port
+          type: cloudify.relationships.depends_on
+        - target: networkConfig
+          type: cloudify.relationships.contained_in
+
+#  webServer:
+#    type: cloudify.openstack.nodes.Server
+#    properties:
+#      install_agent: false
+#      image:  { get_input: web_image_id }
+#      flavor: { get_input: flavor_id }
+#
 #  LB network
 
   lb_network:
@@ -140,3 +180,29 @@ node_templates:
     properties:
       use_external_resource: true
       resource_id: { get_input: management_network_name }
+
+  management_subnet:
+    type: cloudify.openstack.nodes.Subnet
+    properties:
+      use_external_resource: true
+      resource_id: { get_input: management_subnet_name }
+    relationships:
+      - target: management_network
+        type: cloudify.relationships.contained_in
+
+  manager_port:
+    type: cloudify.openstack.nodes.Port
+    properties:
+      use_external_resource: false
+    relationships:
+      - type: cloudify.relationships.contained_in
+        target: management_network
+      - type: cloudify.relationships.depends_on
+        target: management_subnet
+
+outputs:
+  firewall_netip:
+    value:
+      fw_app_gw: { get_attribute: [ app_network_port, fixed_ip_address ]}
+      fw_lb_gw: { get_attribute: [ lb_network_port, fixed_ip_address ]}
+
