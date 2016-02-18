@@ -8,17 +8,16 @@ imports:
 inputs:
 
   agent_user:
-    default: admin
+    default: root
 
   vtm_image:
-    #default: 'e9e86c46-9fd4-445b-ac00-90a7478ead3e' # basic
-    default: '8e2e6383-e354-4092-ad06-dd6fd1331dd7' # snapshot vTM_CFY_VN
+    default: '74ff4015-aee1-4e02-aaa8-1c77b2650394'
 
   flavor:
-    default: '3'
+    default: '196235bc-7ca5-4085-ac81-7e0242bda3f9'
 
   agent_password:
-    default: admin
+    default: password
 
 # inpute from composition
   lb_network:
@@ -86,73 +85,19 @@ node_templates:
         - target: networkConfig
           type: cloudify.relationships.contained_in
 
-
-
-
-
-
-
-
-
-
-
-
-
-node_templates:
-
-  vtmHost:
-    type: cloudify.openstack.nodes.Server
-    properties:
-      install_agent: false
-      image: { get_input: vtm_image }
-      flavor: { get_input: flavor }
-    relationships:
-
-      - target: manager_port
-        type: cloudify.openstack.server_connected_to_port
-
-      - target: lb_network_port
-        type: cloudify.openstack.server_connected_to_port
-
-#      - target: server_float_ip
-#        type: cloudify.openstack.server_connected_to_floating_ip 
-
-
-#  vtmPortConfig:
-#    type: vtm.port.config
-#    relationships:
-#      - target: lb_network1_port
-#        type: cloudify.relationships.connected_to
-#        source_interfaces:
-#          cloudify.interfaces.relationship_lifecycle:
-#            postconfigure:
-#             implementation: vtm.vtm_plugin.tasks.policy_config
-#             executor: central_deployment_agent
-#             inputs:
-#               _vms: { get_input: vm_list }
-#
-#      - target: vtmHost
-#          type: cloudify.relationships.contained_in
-
-#  vtmPolicyConfig:
-#    type: vtm.policy.config
-#    relationships:
-#      - target: vtmHost
-#        type: cloudify.relationships.contained_in
-
 #  LB network
 
   lb_network:
     type: cloudify.openstack.nodes.Network
     properties:
       resource_id: { get_input: lb_network }
-      use_external_resource : true
+      use_external_resource : false #true
 
   lb_network_subnet:
     type: cloudify.openstack.nodes.Subnet
     properties:
       resource_id: { get_input: lb_network_subnet }
-      use_external_resource : true
+      use_external_resource : false #true
     relationships:
       - target: lb_network
         type: cloudify.relationships.contained_in
@@ -193,7 +138,7 @@ node_templates:
     type: cloudify.openstack.nodes.Port
     properties:
       use_external_resource: false
-      fixed_ip: 172.10.1.31
+      fixed_ip: 10.67.79.10
     relationships:
       - type: cloudify.relationships.contained_in
         target: management_network
