@@ -1,9 +1,13 @@
 tosca_definitions_version: cloudify_dsl_1_2
 
+############################################
+# Brocade vTM - traffic managment LB - VNF
+############################################
+
 imports:
-  - http://172.60.0.4:8000/cloudify-types.yaml
-  - http://172.60.0.4:8000/fabric-plugin.yaml
-  - plugins/cloudify-openstack-plugin/plugin.yaml
+    - cloudify-types.yaml
+    - plugin.yaml
+    - fabric-plugin.yaml
 
 inputs:
 
@@ -42,6 +46,7 @@ inputs:
     default: cloudify-management-network-subnet
     type: string
 
+
 node_types:
 
   port_node_type:
@@ -55,6 +60,13 @@ node_templates:
       install_agent: false
       image: { get_input: vtm_image }
       flavor: { get_input: flavor }
+#    relationships:
+
+#     - target: manager_port
+#        type: cloudify.relationships.depends_on
+
+#      - target: lb_network_port
+#        type: cloudify.openstack.server_connected_to_port
 
     interfaces:
       cloudify.interfaces.lifecycle:
@@ -62,29 +74,31 @@ node_templates:
          inputs:
            args:
              nics:
+                #- net-id: { get_attribute: [ management_network, external_id ] }
                 - port-id: { get_attribute: [ manager_port, external_id ] }
                 - port-id: { get_attribute: [ lb_network_port, external_id ] }
 
     relationships:
-        - target: vtmPortConfig
-          type: cloudify.relationships.connected_to
+#        - target: vtmPortConfig
+#          type: cloudify.relationships.connected_to
         - target: lb_network_port
           type: cloudify.relationships.connected_to
-        - target: server_float_ip
-          type: cloudify.openstack.server_connected_to_floating_ip
+#
+#      - target: server_float_ip
+#        type: cloudify.openstack.server_connected_to_floating_ip
 
-  networkConfig:
-    type: cloudify.nodes.Compute
-    properties:
-      install_agent: false
+#  networkConfig:
+#    type: cloudify.nodes.Compute
+#    properties:
+#      install_agent: false
 
-  vtmPortConfig:
-    type: port_node_type
-    relationships:
-        - target: lb_network_port
-          type: cloudify.relationships.depends_on
-        - target: networkConfig
-          type: cloudify.relationships.contained_in
+#  vtmPortConfig:
+#    type: port_node_type
+#    relationships:
+#        - target: lb_network_port
+#          type: cloudify.relationships.depends_on
+#        - target: networkConfig
+#          type: cloudify.relationships.contained_in
 
 #  LB network
 
@@ -92,7 +106,7 @@ node_templates:
     type: cloudify.openstack.nodes.Network
     properties:
       resource_id: { get_input: lb_network }
-      use_external_resource : true
+      use_external_resource : true 
 
   lb_network_subnet:
     type: cloudify.openstack.nodes.Subnet
