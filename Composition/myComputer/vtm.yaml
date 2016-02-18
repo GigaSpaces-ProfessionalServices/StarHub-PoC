@@ -1,14 +1,9 @@
 tosca_definitions_version: cloudify_dsl_1_2
 
-############################################
-# Brocade vTM - traffic managment LB - VNF
-############################################
-
 imports:
-    - http://172.60.0.4:8000/cloudify-types.yaml
-    - http://172.60.0.4:8000/openstack-plugin.yaml
-    - http://172.60.0.4:8000/fabric-plugin.yaml
-#    - plugins/cloudify-vtm-plugin/plugin.yaml
+  - http://www.getcloudify.org/spec/cloudify/3.3.1/types.yaml
+  - http://www.getcloudify.org/spec/fabric-plugin/1.3.1/plugin.yaml
+  - plugins/cloudify-openstack-plugin/plugin.yaml
 
 inputs:
 
@@ -18,7 +13,6 @@ inputs:
   vtm_image:
     #default: 'e9e86c46-9fd4-445b-ac00-90a7478ead3e' # basic
     default: '8e2e6383-e354-4092-ad06-dd6fd1331dd7' # snapshot vTM_CFY_VN
-
 
   flavor:
     default: '3'
@@ -36,35 +30,73 @@ inputs:
     type: string
     default: Tenant-a-LBnetwork-subnet
 
-# inpute from composition
-  vm_list:
-    type: string
-    default: '172.20.0.5'
-
   external_network_name:
     type: string
-    default: VIO-External-01_VLAN301
+    default: external
 
   management_network_name:
-    default: cloudify-management-network
-    type: string
+     type: string
+     default: cloudify-management-network-3.3.1
 
   management_subnet_name:
-    default: cloudify-management-network-subnet
+    default: cloudify-management-network-subnet-3.3.1
     type: string
 
-#node_types:
+node_types:
 
-#  vtm.port.config:
-#    derived_from: cloudify.nodes.SoftwareComponent
-#    interfaces:
-#      cloudify.interfaces.lifecycle:
-#        configure:
-#           implementation: vtm.vtm_plugin.tasks.port_config
-#           executor: central_deployment_agent
+    port_node_type:
+       derived_from: cloudify.nodes.SoftwareComponent
 
-#  vtm.policy.config:
-#    derived_from: cloudify.nodes.SoftwareComponent
+node_templates:
+
+  vtmServer:
+    type: cloudify.openstack.nodes.Server
+    properties:
+      install_agent: false
+      image:  { get_input: image_id }
+      flavor: { get_input: flavor_id }
+    interfaces:
+      cloudify.interfaces.lifecycle:
+       create:
+         inputs:
+           args:
+             nics:
+                - port-id: { get_attribute: [ manager_port, external_id ] }
+                - port-id: { get_attribute: [ lb_network_port, external_id ] }
+
+    relationships:
+        - target: vtmPortConfig
+          type: cloudify.relationships.connected_to
+        - target: lb_network_port
+          type: cloudify.relationships.connected_to
+
+        - target: server_float_ip
+          type: cloudify.openstack.server_connected_to_floating_ip
+
+  networkConfig:
+    type: cloudify.nodes.Compute
+    properties:
+      install_agent: false
+
+  vtmPortConfig:
+    type: port_node_type
+    relationships:
+        - target: lb_network_port
+          type: cloudify.relationships.depends_on
+        - target: networkConfig
+          type: cloudify.relationships.contained_in
+
+
+
+
+
+
+
+
+
+
+
+
 
 node_templates:
 
