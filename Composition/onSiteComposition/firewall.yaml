@@ -122,7 +122,7 @@ node_templates:
     type: cloudify.openstack.nodes.Port
     properties:
       use_external_resource : false
-      fixed_ip: 172.30.0.3
+      fixed_ip: 172.30.0.250
     relationships:
       - type: cloudify.relationships.contained_in
         target: lb_network
@@ -144,7 +144,7 @@ node_templates:
       use_external_resource : true
       subnet:
         ip_version: 4
-        cidr: 172.20.0.0/29
+        cidr: 172.20.0.0/28
     relationships:
       - target: app_network
         type: cloudify.relationships.contained_in
@@ -153,7 +153,7 @@ node_templates:
     type: cloudify.openstack.nodes.Port
     properties:
       use_external_resource : false
-      fixed_ip: 172.20.0.3
+      fixed_ip: 172.20.0.4
     relationships:
       - type: cloudify.relationships.contained_in
         target: app_network

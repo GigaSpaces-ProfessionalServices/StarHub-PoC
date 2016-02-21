@@ -12,7 +12,7 @@ inputs:
 
   vtm_image:
     #default: 'e9e86c46-9fd4-445b-ac00-90a7478ead3e' # basic
-    default: '8e2e6383-e354-4092-ad06-dd6fd1331dd7' # snapshot vTM_CFY_VN
+    default: 'edcb4aa2-7ad3-42ff-a75f-fedea1065614' # snapshot vTM_CFY_VNF1902
 
   flavor:
     default: '3'
@@ -68,8 +68,8 @@ node_templates:
     relationships:
         - target: vtmPortConfig
           type: cloudify.relationships.connected_to
-        - target: lb_network_port
-          type: cloudify.relationships.connected_to
+#        - target: lb_network_port
+#          type: cloudify.relationships.connected_to
         - target: server_float_ip
           type: cloudify.openstack.server_connected_to_floating_ip
 
@@ -86,6 +86,22 @@ node_templates:
         - target: networkConfig
           type: cloudify.relationships.contained_in
 
+  vtmRoutingConfig:
+    type: cloudify.nodes.SoftwareComponent
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        start:
+          implementation: fabric.fabric_plugin.tasks.run_script
+          inputs:
+            script_path: scripts/setRouting.sh
+            fabric_env:
+               user: { get_input: agent_user }
+               password: { get_input: agent_password }
+               host_string: { get_attribute: [ vtmServer, ip ] }
+    relationships:
+        - target: vtmServer
+          type: cloudify.relationships.contained_in
+
 #  LB network
 
   lb_network:
@@ -99,9 +115,6 @@ node_templates:
     properties:
       resource_id: { get_input: lb_network_subnet }
       use_external_resource : true
-      subnet:
-        ip_version: 4
-        cidr: 172.30.0.0/24
     relationships:
       - target: lb_network
         type: cloudify.relationships.contained_in
@@ -110,7 +123,7 @@ node_templates:
     type: cloudify.openstack.nodes.Port
     properties:
       use_external_resource : false
-      fixed_ip: 172.30.0.10
+      fixed_ip: 172.30.0.240
     relationships:
       - type: cloudify.relationships.contained_in
         target: lb_network
@@ -142,7 +155,7 @@ node_templates:
     type: cloudify.openstack.nodes.Port
     properties:
       use_external_resource: false
-      fixed_ip: 172.10.1.31
+      fixed_ip: 172.10.1.87
     relationships:
       - type: cloudify.relationships.contained_in
         target: management_network

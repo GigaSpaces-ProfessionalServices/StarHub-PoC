@@ -1,9 +1,9 @@
 #!/bin/bash
 
-ctx logger info "---- Set route to FW and start Webserver  "
+ctx logger info "---> Set route to FW 172.20.0.4 and start Webserver  "
 
 subnet='172.30.0.0/24'
-gw='172.20.0.3'
+gw='172.20.0.4'
 
 ip=$(ifconfig | grep 172.20 | awk '{print $2}')
 
@@ -22,7 +22,7 @@ cat <<EOF > /root/index.html
 EOF
 
 cd /root
-echo "nohup python -m SimpleHTTPServer 80 &" > /root/start.sh
-chmod +x start.sh
-./start.sh
+rm -f nohup
+
+dtach -n nohup python -m SimpleHTTPServer 80 
 

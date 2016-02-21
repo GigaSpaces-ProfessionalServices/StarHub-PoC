@@ -25,7 +25,8 @@ inputs:
     type: string
 
   image_id:
-    default: 'e33f993a-79eb-4187-8a91-b28b10cfbb45' # agent  centos no cloud-init
+    default: 'd869319e-165e-45d8-a9ea-afccb8d3959c' # agent  centos no cloud-init with dtach
+    #default: 'e33f993a-79eb-4187-8a91-b28b10cfbb45' # agent  centos no cloud-init
     #default: '3cc7d237-2009-48a8-8dee-cb956d70f057' # agent centos 7
     type: string
 
@@ -81,10 +82,39 @@ node_templates:
       use_external_resource : false
       subnet:
         ip_version: 4
-        cidr: 172.20.0.0/29
+        cidr: 172.20.0.0/28
     relationships:
       - target: application_network
         type: cloudify.relationships.contained_in
+
+  server1_port:
+    type: cloudify.openstack.nodes.Port
+    properties:
+      use_external_resource : false
+      fixed_ip: 172.20.0.5
+    relationships:
+      - type: cloudify.relationships.contained_in
+        target: application_network
+      - type: cloudify.relationships.depends_on
+        target: application_network_subnet
+
+  server2_port:
+    type: cloudify.openstack.nodes.Port
+    properties:
+      use_external_resource : false
+      fixed_ip: 172.20.0.6
+    relationships:
+      - type: cloudify.relationships.contained_in
+        target: application_network
+      - type: cloudify.relationships.depends_on
+        target: application_network_subnet
+
+
+  management_network:
+    type: cloudify.openstack.nodes.Network
+    properties:
+      use_external_resource: true
+      resource_id: { get_input: management_network_name }
 
 # Create a LB Network
 
@@ -122,12 +152,15 @@ node_templates:
            args:
              nics:
                 - net-id: { get_attribute: [ management_network, external_id ] }
-                - net-id: { get_attribute: [ application_network, external_id ] }
+                - port-id: { get_attribute: [ server1_port, external_id ] }
+
     relationships:
         - target: webServer1PortConfig
           type: cloudify.relationships.connected_to
-        - target: application_network
+        - target: server1_port
           type: cloudify.relationships.connected_to
+        - target: fw_deployment
+          type: cloudify.relationships.depends_on
 
   networkConfig:
     type: cloudify.nodes.Compute
@@ -137,7 +170,7 @@ node_templates:
   webServer1PortConfig:
     type: port_node_type
     relationships:
-        - target: application_network
+        - target: server1_port
           type: cloudify.relationships.depends_on
         - target: networkConfig
           type: cloudify.relationships.contained_in
@@ -176,12 +209,15 @@ node_templates:
            args:
              nics:
                 - net-id: { get_attribute: [ management_network, external_id ] }
-                - net-id: { get_attribute: [ application_network, external_id ] }
+                - port-id: { get_attribute: [ server2_port, external_id ] }
+
     relationships:
         - target: webServer2PortConfig
           type: cloudify.relationships.connected_to
-        - target: application_network
+        - target: server2_port
           type: cloudify.relationships.connected_to
+        - target: webServer1
+          type: cloudify.relationships.depends_on
 
   network2Config:
     type: cloudify.nodes.Compute
@@ -191,7 +227,7 @@ node_templates:
   webServer2PortConfig:
     type: port_node_type
     relationships:
-        - target: application_network
+        - target: server2_port
           type: cloudify.relationships.depends_on
         - target: network2Config
           type: cloudify.relationships.contained_in
@@ -226,7 +262,6 @@ node_templates:
               deployment_inputs:
                 lb_network: { get_property: [ lb_network, resource_id ] }
                 lb_network_subnet: { get_property: [ lb_network_subnet, resource_id ] }
-                vm_list:  { get_attribute: [ webServer1, ip ] }
 
       relationships:
         - target: webServer1
@@ -279,4 +314,10 @@ node_templates:
         relationships:
           - target: fw_deployment
             type: cloudify.relationships.connected_to
+
+outputs:
+  firewall_inherit_outputs:
+    value:
+      firwall_app_ip: { get_attribute: [ fw_proxy_deployment, fw_app_p ]}
+      firewall_lb_ip: { get_attribute: [ fw_proxy_deployment, fw_lb_p ]}
 

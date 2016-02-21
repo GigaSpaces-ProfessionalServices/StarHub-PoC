@@ -7,7 +7,7 @@ cfy blueprints delete -b loadbalancer
 cfy blueprints delete -b serviceChain
 
 cfy blueprints upload -b firewall     -p firewall.yaml
-cfy blueprints upload -b loadBalancer -p loadbalancer.yaml
+cfy blueprints upload -b loadbalancer -p loadbalancer.yaml
 cfy blueprints upload -b serviceChain -p serviceChain.yaml
 
 cfy deployments create -b serviceChain -d serviceChain
