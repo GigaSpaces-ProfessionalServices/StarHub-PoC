@@ -49,6 +49,14 @@ inputs:
      type: string
      default: cloudify-management-network
 
+  fw_lb_network_port:
+    type: string
+    default: '172.30.0.250'
+
+  fw_app_network_port:
+    type: string
+    default: '172.20.0.4'
+
 node_types:
 
   port_node_type:
@@ -111,9 +119,6 @@ node_templates:
     properties:
       resource_id: { get_input: lb_network_subnet }
       use_external_resource : true
-      subnet:
-        ip_version: 4
-        cidr: 172.30.0.0/24
     relationships:
       - target: lb_network
         type: cloudify.relationships.contained_in
@@ -122,7 +127,7 @@ node_templates:
     type: cloudify.openstack.nodes.Port
     properties:
       use_external_resource : false
-      fixed_ip: 172.30.0.250
+      fixed_ip:  { get_input: fw_lb_network_port } #172.30.0.250
     relationships:
       - type: cloudify.relationships.contained_in
         target: lb_network
@@ -142,9 +147,6 @@ node_templates:
     properties:
       resource_id: { get_input: app_network_subnet }
       use_external_resource : true
-      subnet:
-        ip_version: 4
-        cidr: 172.20.0.0/28
     relationships:
       - target: app_network
         type: cloudify.relationships.contained_in
@@ -153,7 +155,7 @@ node_templates:
     type: cloudify.openstack.nodes.Port
     properties:
       use_external_resource : false
-      fixed_ip: 172.20.0.4
+      fixed_ip: { get_input: fw_app_network_port } #172.20.0.4
     relationships:
       - type: cloudify.relationships.contained_in
         target: app_network
