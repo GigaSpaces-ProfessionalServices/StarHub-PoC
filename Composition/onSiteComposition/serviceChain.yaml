@@ -26,8 +26,6 @@ inputs:
 
   image_id:
     default: 'd869319e-165e-45d8-a9ea-afccb8d3959c' # agent  centos no cloud-init with dtach
-    #default: 'e33f993a-79eb-4187-8a91-b28b10cfbb45' # agent  centos no cloud-init
-    #default: '3cc7d237-2009-48a8-8dee-cb956d70f057' # agent centos 7
     type: string
 
   flavor_id:
@@ -41,6 +39,18 @@ inputs:
   agent_password:
     type: string
     default: password
+
+  webServer1_port:
+    type: string
+    defaut: '172.20.0.5'
+
+  webServer2_port:
+    type: string
+    defaut: '172.20.0.6'
+
+  lb_manager_port:
+    type: string
+    defaut: '172.10.1.87'
 
   private_key_name:
     type: string
@@ -56,9 +66,19 @@ inputs:
     type: string
     description: FW blueprint ID
 
+  fw_lb_network_port:
+    type: string
+    defaut: '172.30.0.250'
+
+  fw_app_network_port:
+    type: string
+    defaut: '172.20.0.4'
+
   management_network_name:
      type: string
      default: cloudify-management-network
+
+
 
 node_types:
 
@@ -82,7 +102,7 @@ node_templates:
       use_external_resource : false
       subnet:
         ip_version: 4
-        cidr: 172.20.0.0/28
+        cidr: { get_input: application_network_subnet } #172.20.0.0/28
     relationships:
       - target: application_network
         type: cloudify.relationships.contained_in
@@ -91,7 +111,7 @@ node_templates:
     type: cloudify.openstack.nodes.Port
     properties:
       use_external_resource : false
-      fixed_ip: 172.20.0.5
+      fixed_ip: { get_input: webServer1_port } #172.20.0.5
     relationships:
       - type: cloudify.relationships.contained_in
         target: application_network
@@ -102,7 +122,7 @@ node_templates:
     type: cloudify.openstack.nodes.Port
     properties:
       use_external_resource : false
-      fixed_ip: 172.20.0.6
+      fixed_ip: { get_input: webServer2_port } #172.20.0.6
     relationships:
       - type: cloudify.relationships.contained_in
         target: application_network
@@ -131,7 +151,7 @@ node_templates:
       use_external_resource : true
       subnet:
         ip_version: 4
-        cidr: 172.30.0.0/24
+        cidr: { get_input: lb_network_subnet } #172.30.0.0/24
     relationships:
       - target: lb_network
         type: cloudify.relationships.contained_in
@@ -262,6 +282,8 @@ node_templates:
               deployment_inputs:
                 lb_network: { get_property: [ lb_network, resource_id ] }
                 lb_network_subnet: { get_property: [ lb_network_subnet, resource_id ] }
+                lb_network_port: { get_input: [ lb_network_port ] }
+                lb_manager_port: { get_input: [ lb_manager_port ] }
 
       relationships:
         - target: webServer1
@@ -284,8 +306,12 @@ node_templates:
                 deployment_inputs:
                   lb_network: { get_property: [ lb_network, resource_id ] }
                   lb_network_subnet: { get_property: [ lb_network_subnet, resource_id ] }
+                  lb_network_port: { get_input: [ fw_lb_network_port ] }
+
                   app_network: { get_property: [ application_network, resource_id ] }
                   app_network_subnet: { get_property: [ application_network_subnet, resource_id ] }
+                  app_network_port: { get_input: [ fw_app_network_port ] }
+
 
         relationships:
           - target: lb_network
@@ -318,6 +344,6 @@ node_templates:
 outputs:
   firewall_inherit_outputs:
     value:
-      firwall_app_ip: { get_attribute: [ fw_proxy_deployment, fw_app_p ]}
-      firewall_lb_ip: { get_attribute: [ fw_proxy_deployment, fw_lb_p ]}
+      firwall_app_ip: { get_attribute: [ fw_proxy_deployment, fw_app_ip ]}
+      firewall_lb_ip: { get_attribute: [ fw_proxy_deployment, fw_lb_ip ]}
 

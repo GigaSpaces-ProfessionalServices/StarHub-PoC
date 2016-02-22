@@ -30,6 +30,14 @@ inputs:
     type: string
     default: Tenant-a-LBnetwork-subnet
 
+  lb_network_port:
+    type: string
+    default: '172.30.0.240'
+
+  lb_manager_port:
+    type: string
+    default: '172.10.1.87'
+
   external_network_name:
     type: string
     default: VIO-External-01_VLAN301
@@ -123,7 +131,7 @@ node_templates:
     type: cloudify.openstack.nodes.Port
     properties:
       use_external_resource : false
-      fixed_ip: 172.30.0.240
+      fixed_ip: { get_input: lb_network_port } #172.30.0.240
     relationships:
       - type: cloudify.relationships.contained_in
         target: lb_network
@@ -155,7 +163,7 @@ node_templates:
     type: cloudify.openstack.nodes.Port
     properties:
       use_external_resource: false
-      fixed_ip: 172.10.1.87
+      fixed_ip: { get_input: lb_manager_port } #172.10.1.87
     relationships:
       - type: cloudify.relationships.contained_in
         target: management_network

@@ -173,9 +173,8 @@ node_templates:
       resource_id: { get_input: management_network_name }
 
 outputs:
-  firewall_netip:
-    value:
-      fw_app_ip: { get_attribute: [ app_network_port, fixed_ip_address ]}
-      fw_lb_ip: { get_attribute: [ lb_network_port, fixed_ip_address ]}
-
+  fw_app_ip :
+      value : { get_attribute: [ app_network_port, fixed_ip_address ]}
+  fw_lb_ip:
+      value : { get_attribute: [ lb_network_port, fixed_ip_address ]}
 
