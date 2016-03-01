@@ -64,13 +64,26 @@ node_templates:
     type: cloudify.openstack.nodes.Network
     properties:
       resource_id: { get_input: application_network_name }
-      use_external_resource : true #false
+      use_external_resource : false
+
+  application_network_subnet:
+    type: cloudify.openstack.nodes.Subnet
+    properties:
+      resource_id: { get_input: application_network_subnet_name }
+      use_external_resource : false
+      subnet:
+        ip_version: 4
+        cidr: 172.20.0.0/29
+    relationships:
+      - target: application_network
+        type: cloudify.relationships.contained_in
 
   management_network:
     type: cloudify.openstack.nodes.Network
     properties:
       use_external_resource: true
       resource_id: { get_input: management_network_name }
+
 
 # Create an Application VM
 
@@ -81,20 +94,23 @@ node_templates:
       server:
         image: { get_input: image_id }
         flavor: { get_input: flavor_id }
-    interfaces:
-      cloudify.interfaces.lifecycle:
-       create:
-         inputs:
-           args:
-             nics:
-                - net-id: { get_attribute: [ management_network, external_id ] }
-                - net-id: { get_attribute: [ application_network, external_id ] }
+#    interfaces:
+#      cloudify.interfaces.lifecycle:
+#       create:
+#         inputs:
+#           args:
+#             nics:
+#                - net-id: { get_attribute: [ management_network, external_id ] }
+#                - net-id: { get_attribute: [ application_network, external_id ] }
 
     relationships:
         - target: webServer1PortConfig
           type: cloudify.relationships.connected_to
         - target: application_network
           type: cloudify.relationships.connected_to
+        - target: management_network
+          type: cloudify.relationships.connected_to
+
 
   networkConfig:
     type: cloudify.nodes.Compute
@@ -106,6 +122,7 @@ node_templates:
     relationships:
         - target: application_network
           type: cloudify.relationships.depends_on
+
         - target: networkConfig
           type: cloudify.relationships.contained_in
 

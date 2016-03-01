@@ -2,6 +2,8 @@
 
 echo "--- Start deploying service chain ---"
 
+cfy deployments delete -d serviceChain
+
 cfy blueprints delete -b firewall
 cfy blueprints delete -b loadbalancer
 cfy blueprints delete -b serviceChain

@@ -60,21 +60,12 @@ node_templates:
       install_agent: false
       image: { get_input: vtm_image }
       flavor: { get_input: flavor }
-#    relationships:
-
-#     - target: manager_port
-#        type: cloudify.relationships.depends_on
-
-#      - target: lb_network_port
-#        type: cloudify.openstack.server_connected_to_port
-
     interfaces:
       cloudify.interfaces.lifecycle:
        create:
          inputs:
            args:
              nics:
-                #- net-id: { get_attribute: [ management_network, external_id ] }
                 - port-id: { get_attribute: [ manager_port, external_id ] }
                 - port-id: { get_attribute: [ lb_network_port, external_id ] }
 
@@ -113,9 +104,6 @@ node_templates:
     properties:
       resource_id: { get_input: lb_network_subnet }
       use_external_resource : true
-      subnet:
-        ip_version: 4
-        cidr: 172.30.0.0/24
     relationships:
       - target: lb_network
         type: cloudify.relationships.contained_in

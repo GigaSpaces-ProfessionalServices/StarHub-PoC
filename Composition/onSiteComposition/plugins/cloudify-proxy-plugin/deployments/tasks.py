@@ -93,6 +93,7 @@ def inherit_deployment_attributes(deployment_id, **kwargs):
             ctx.instance.runtime_properties.update(
                 {key: deployment_outputs.get(key)}
             )
+
     except Exception as ex:
         ctx.logger.error(
             "Caught exception during obtaining "
