@@ -96,9 +96,6 @@ node_templates:
             fabric_env:
                user: { get_input: agent_name }
                password: { get_input: agent_password }
-               host_string: { get_attribute: [ webServer, ip ] }
     relationships:
         - target: webServer
           type: cloudify.relationships.contained_in
-
-

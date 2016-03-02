@@ -11,8 +11,6 @@ inputs:
     default: admin
 
   vtm_image:
-    #default: 'e9e86c46-9fd4-445b-ac00-90a7478ead3e' # basic
-    #default: 'edcb4aa2-7ad3-42ff-a75f-fedea1065614' # snapshot vTM_CFY_VNF1902
     default: '6d968ee7-b659-4997-a864-d9daf28a6382' # snapshot vTM_CFY_VNF2902
 
   flavor:
@@ -69,8 +67,8 @@ node_templates:
     relationships:
         - target: vtmPortConfig
           type: cloudify.relationships.connected_to
-#        - target: lb_network_port
-#          type: cloudify.relationships.connected_to
+        - target: lb_network_port
+          type: cloudify.relationships.connected_to
         - target: server_float_ip
           type: cloudify.openstack.server_connected_to_floating_ip
 
@@ -86,22 +84,6 @@ node_templates:
           type: cloudify.relationships.depends_on
         - target: vtmNetworkConfig
           type: cloudify.relationships.contained_in
-
-#  vtmRoutingConfig:
-#    type: cloudify.nodes.SoftwareComponent
-#    interfaces:
-#      cloudify.interfaces.lifecycle:
-#        start:
-#          implementation: fabric.fabric_plugin.tasks.run_script
-#          inputs:
-#            script_path: scripts/setRouting.sh
-#            fabric_env:
-#               user: { get_input: agent_user }
-#               password: { get_input: agent_password }
-#               host_string: { get_attribute: [ vtmServer, ip ] }
-#    relationships:
-#        - target: vtmServer
-#          type: cloudify.relationships.contained_in
 
 #  LB network
 
