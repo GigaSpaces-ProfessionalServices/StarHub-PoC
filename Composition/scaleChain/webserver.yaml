@@ -79,7 +79,6 @@ node_templates:
              nics:
                 - net-id: { get_attribute: [ management_network, external_id ] }
                 - net-id: { get_attribute: [ application_network,  external_id ]  }
-
     relationships:
         - target: application_network
           type: cloudify.relationships.connected_to
@@ -99,3 +98,35 @@ node_templates:
     relationships:
         - target: webServer
           type: cloudify.relationships.contained_in
+
+
+  policy_node_type:
+    derived_from: cloudify.nodes.SoftwareComponent
+    properties:
+       nodes_to_monitor:
+          default: []
+    interfaces:
+       cloudify.interfaces.lifecycle:
+          start:
+             implementation: scripts/policy-start.sh
+             executor: central_deployment_agent
+          stop:
+             implementation: scripts/policy-stop.sh
+             executor: central_deployment_agent
+
+  a_node:
+     type: cloudify.nodes.Compute
+     properties:
+        install_agent: false
+
+  policy_node:
+     type: policy_node_type
+     relationships:
+        - target: webServer
+          type: cloudify.relationships.depends_on
+        - target: a_node
+          type: cloudify.relationships.contained_in
+     properties:
+       nodes_to_monitor:
+          - target: webServer
+            type: cloudify.relationships.contained_in
