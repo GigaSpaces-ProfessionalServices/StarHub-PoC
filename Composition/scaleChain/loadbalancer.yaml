@@ -70,8 +70,6 @@ node_templates:
           type: cloudify.relationships.connected_to
         - target: lb_network_port
           type: cloudify.relationships.connected_to
-#        - target: server_float_ip
-#          type: cloudify.openstack.server_connected_to_floating_ip
 
   vtmNetworkConfig:
     type: cloudify.nodes.Compute
@@ -128,12 +126,6 @@ node_templates:
         target: lb_network
       - type: cloudify.relationships.depends_on
         target: lb_network_subnet
-
-#  server_float_ip:
-#    type: cloudify.openstack.nodes.FloatingIP
-#    properties:
-#      floatingip:
-#        floating_network_name: { get_input: external_network_name }
 
   management_network:
     type: cloudify.openstack.nodes.Network
