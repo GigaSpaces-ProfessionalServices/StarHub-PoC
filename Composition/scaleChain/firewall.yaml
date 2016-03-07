@@ -12,8 +12,6 @@ inputs:
 
   fortinet_image:
    default: '3d8edfea-f1ba-44cc-93f2-5339ca875d9a' # snapshot FortiGate_3.2_CFY_VNF - dhcp image
-#  default: 'd9648527-6d9b-468c-9d5d-4fdf235c20be' # original
-#  default: '7f5196a5-db06-4a47-93c1-54ca623c8b8e' # FortiGate_static_CFY_VNF
 
   flavor:
     default: '3'
