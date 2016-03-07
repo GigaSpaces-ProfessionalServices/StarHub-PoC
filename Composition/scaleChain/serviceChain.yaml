@@ -133,8 +133,6 @@ node_templates:
       relationships:
         - target: fw_deployment
           type: cloudify.relationships.connected_to
-#        - target: webserver1_deployment
-#          type: cloudify.relationships.connected_to
 
 
   lb_deployment:
