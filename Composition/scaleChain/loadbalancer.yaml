@@ -11,7 +11,8 @@ inputs:
     default: admin
 
   vtm_image:
-    default: '6d968ee7-b659-4997-a864-d9daf28a6382' # snapshot vTM_CFY_VNF2902
+    #default: '6d968ee7-b659-4997-a864-d9daf28a6382' # snapshot vTM_CFY_VNF2902
+    default: 'd6b749cf-328c-4ae1-96c5-46198d11dbcd'
 
   flavor:
     default: '3'
@@ -69,8 +70,8 @@ node_templates:
           type: cloudify.relationships.connected_to
         - target: lb_network_port
           type: cloudify.relationships.connected_to
-        - target: server_float_ip
-          type: cloudify.openstack.server_connected_to_floating_ip
+#        - target: server_float_ip
+#          type: cloudify.openstack.server_connected_to_floating_ip
 
   vtmNetworkConfig:
     type: cloudify.nodes.Compute
@@ -84,6 +85,21 @@ node_templates:
           type: cloudify.relationships.depends_on
         - target: vtmNetworkConfig
           type: cloudify.relationships.contained_in
+
+#  vtmRoutingConfig:
+#    type: cloudify.nodes.SoftwareComponent
+#    interfaces:
+#      cloudify.interfaces.lifecycle:
+#        start:
+#          implementation: fabric.fabric_plugin.tasks.run_script
+#          inputs:
+#            script_path: scripts/setRouting.sh
+#            fabric_env:
+#               user: { get_input: agent_user }
+#               password: { get_input: agent_password }
+#    relationships:
+#        - target: vtmServer
+#          type: cloudify.relationships.contained_in
 
 #  LB network
 
@@ -113,11 +129,11 @@ node_templates:
       - type: cloudify.relationships.depends_on
         target: lb_network_subnet
 
-  server_float_ip:
-    type: cloudify.openstack.nodes.FloatingIP
-    properties:
-      floatingip:
-        floating_network_name: { get_input: external_network_name }
+#  server_float_ip:
+#    type: cloudify.openstack.nodes.FloatingIP
+#    properties:
+#      floatingip:
+#        floating_network_name: { get_input: external_network_name }
 
   management_network:
     type: cloudify.openstack.nodes.Network
